@@ -1,0 +1,63 @@
+version: "3.2"
+services:
+  backend_services:
+    build:
+      context: ./server
+    depends_on:
+      - postgres
+    networks: 
+      - network
+    environment: 
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=userdb
+    ports:
+      - "3001:3001"
+    volumes: 
+      - /home/kaithleen/Desktop/Backend/server:/app
+    container_name: nodejs
+    tty: true
+
+  feed_service:
+    build:
+      context: ./server2
+    command: python3 ./main.py
+    depends_on:
+      - postgres
+      - feed_redis
+    networks: 
+      - network
+    environment: 
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=userdb
+    container_name: mainpy
+    tty: true
+
+  feed_redis:
+    image: 'bitnami/redis:latest' 
+    networks: 
+      - network
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    container_name: feed_redis
+
+  postgres:
+    restart: always
+    image: postgres:13-alpine
+    networks: 
+      - network
+    volumes: 
+      - ../db_mount:/var/lib/postgresql/data
+      - ./server/db_init/:/docker-entrypoint-initdb.d/
+    environment: 
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=userdb
+    container_name: projectdb
+
+networks:
+  network:
