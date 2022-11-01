@@ -6,6 +6,11 @@ import random
 import numpy as np
 from datetime import datetime
 import matplotlib.pyplot as plt
+import redis
+import json
+
+redis_feed = redis.Redis(host='localhost', port=6379, db=0)
+# publish new music in the channel epic_music
 
 def brownianMotion(T, mu, sigma, dt, S0):
     N = round(T/dt)
@@ -19,7 +24,7 @@ def brownianMotion(T, mu, sigma, dt, S0):
 S0 = 20000
 S_feed = [S0]
 while True:
-    S = brownianMotion(2, 0.001, 0.1, 0.01, 20000)
+    S = brownianMotion(2, 0, 0.1, 0.01, 20000)
     S_feed.append(round((S[0]),2))
     S_feed.pop(0)
     final_S = S_feed[-1]
@@ -32,10 +37,12 @@ while True:
         'timestamp': current_time
         }
     print(feed)
+    redis_feed.publish('price feed', json.dumps(feed))
     plt.scatter(current_time, final_S, linestyle='--')
     plt.pause(1)
 
 plt.show()
+
 
 # in terminal:
 # cd server2
