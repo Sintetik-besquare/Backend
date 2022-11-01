@@ -8,7 +8,7 @@ services:
     networks: 
       - network
     environment: 
-      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_PORT=5432
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=sintetik
@@ -30,7 +30,7 @@ services:
     networks: 
       - network
     environment: 
-      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_PORT=5432
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=sintetik
@@ -54,7 +54,7 @@ services:
       - ../db_mount:/var/lib/postgresql/data
       - ./server/db_init/:/docker-entrypoint-initdb.d/
     environment: 
-      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_PORT=5432
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=sintetik
