@@ -1,13 +1,13 @@
+require('dotenv').config();
 const express = require('express');
 const http = require('http');
 const morgan = require('morgan');
 const cors = require('cors');
 
 //list of all available routes
-const indexRouter = require('./routes/index');
 const userRouter = require('./routes/user');
-const dbRouter = require('./routes/db');
-const decode = require('./middlewares/jwt');
+
+// const decode = require('./middlewares/jwt');
 
 
 //get port from environment and store in Express. 
@@ -27,8 +27,9 @@ app.use(express.json());
 app.use(express.urlencoded({extended: true}))
 
 //API endpoint example
-app.use('/signup',dbRouter);
 app.use('/user',userRouter);
+
+
 
 //Error for invalid API endpoint
 app.use('*', (req, res) => {

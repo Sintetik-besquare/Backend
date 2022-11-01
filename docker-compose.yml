@@ -8,14 +8,15 @@ services:
     networks: 
       - network
     environment: 
-      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_PORT=5432
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_DB=userdb
+      - POSTGRES_DB=sintetik
+      - SECRET=${SECRET}
     ports:
       - "3001:3001"
     volumes: 
-      - /home/kaithleen/Desktop/Backend/server:/app
+      - /home/goh/Desktop/Sintetik-Backend/server:/usr/src/app
     container_name: nodejs
     tty: true
 
@@ -29,12 +30,10 @@ services:
     networks: 
       - network
     environment: 
-      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_PORT=5432
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_DB=userdb
-    ports:
-      - "5001:80"
+      - POSTGRES_DB=sintetik
     container_name: mainpy
     tty: true
 
@@ -55,10 +54,10 @@ services:
       - ../db_mount:/var/lib/postgresql/data
       - ./server/db_init/:/docker-entrypoint-initdb.d/
     environment: 
-      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_PORT=5432
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_DB=userdb
+      - POSTGRES_DB=sintetik
     container_name: projectdb
 
 networks:
