@@ -1,4 +1,4 @@
-
+require('dotenv').config();
 const env = process.env;
 
 const app_config = {

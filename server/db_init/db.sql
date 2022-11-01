@@ -1,10 +1,9 @@
---CREATE DATABASE userdb;
-CREATE SCHEMA sintetik;
+CREATE SCHEMA IF NOT EXISTS users;
 
-CREATE TABLE sintetik.account(
+CREATE TABLE users.credential(
     user_id SERIAL PRIMARY KEY,
     email VARCHAR ( 255 ) UNIQUE NOT NULL,
-    password VARCHAR ( 50 ) NOT NULL
+    password VARCHAR ( 255 ) NOT NULL
 );
 
 --example
