@@ -5,9 +5,9 @@ services:
       context: ./server
     depends_on:
       - postgres
-    networks: 
+    networks:
       - network
-    environment: 
+    environment:
       - POSTGRES_PORT=5432
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
@@ -15,8 +15,8 @@ services:
       - SECRET=${SECRET}
     ports:
       - "3001:3001"
-    volumes: 
-      - /home/kaithleen/Desktop/Backend/server:/usr/src/app
+    volumes:
+      - /home/afiq/Desktop/DRC/Backend/server:/usr/src/app
     container_name: nodejs
     tty: true
 
@@ -27,9 +27,9 @@ services:
     depends_on:
       - postgres
       - feed_redis
-    networks: 
+    networks:
       - network
-    environment: 
+    environment:
       - POSTGRES_PORT=5432
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
@@ -38,8 +38,8 @@ services:
     tty: true
 
   feed_redis:
-    image: 'bitnami/redis:latest' 
-    networks: 
+    image: "bitnami/redis:latest"
+    networks:
       - network
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
@@ -48,12 +48,12 @@ services:
   postgres:
     restart: always
     image: postgres:13-alpine
-    networks: 
+    networks:
       - network
-    volumes: 
+    volumes:
       - ../db_mount:/var/lib/postgresql/data
       - ./server/db_init/:/docker-entrypoint-initdb.d/
-    environment: 
+    environment:
       - POSTGRES_PORT=5432
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
