@@ -15,8 +15,8 @@ services:
       - SECRET=${SECRET}
     ports:
       - "3001:3001"
-    volumes:
-      - /home/sintetik/DRC/Backend/server:/usr/src/app
+    # volumes:
+    #   - /var/www/sintetik/_work/Backend/Backend/server:/usr/src/app
     container_name: nodejs
     tty: true
 
