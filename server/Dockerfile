@@ -2,11 +2,11 @@ From node:18-alpine
 
 WORKDIR /usr/src/app
 
-COPY package.json /usr/src/app
+COPY package.json .
 
 RUN npm install
 
-COPY . /usr/src/app
+COPY . .
 
 EXPOSE 3001
 
