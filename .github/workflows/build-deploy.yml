@@ -31,9 +31,9 @@ jobs:
       - name: Create .env file
         run: |
           touch .env
-          echo ${{ secrets.SECRET }} >> .env
-          echo ${{ secrets.POSTGRES_USER }} >> .env
-          echo ${{ secrets.POSTGRES_PASSWORD }} >> .env
+          echo '${{ secrets.SECRET }}' >> .env
+          echo '${{ secrets.POSTGRES_USER }}' >> .env
+          echo '${{ secrets.POSTGRES_PASSWORD }}' >> .env
           cat .env
 
       - name: Running Docker compose
