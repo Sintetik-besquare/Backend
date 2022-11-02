@@ -1,8 +1,6 @@
 # !!!note to self: this model still has a drift denoted by mu which is NOT preferable!!!
 # update: the drift can be removed by equating the mu to 0, making it a martigale. However, more research should be done before finalising this value
 
-import time
-import random
 import numpy as np
 from datetime import datetime
 import matplotlib.pyplot as plt
@@ -34,7 +32,8 @@ def send_feed():
     current_time = date_time.strftime("%m/%d/%Y, %H:%M:%S")
     feed = {
         'price': final_S,
-        'timestamp': current_time
+        'timestamp': current_time,
+        'symbol_name': str("Volatility 10 (1s)")
         }
     print(feed)
     redis_feed.publish('price feed', json.dumps(feed))
@@ -43,7 +42,7 @@ def send_feed():
 
 send_feed()
 
-plt.show()
+# plt.show()
 
 
 # in terminal:
