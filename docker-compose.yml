@@ -16,7 +16,7 @@ services:
     ports:
       - "3001:3001"
     volumes: 
-      - /home/goh/Desktop/Sintetik-Backend/server:/usr/src/app
+      - /home/kathleen/Desktop/Backend/server:/usr/src/app
     container_name: nodejs
     tty: true
 
