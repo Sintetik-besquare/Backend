@@ -8,9 +8,9 @@ from datetime import datetime
 import matplotlib.pyplot as plt
 import redis
 import json
+import threading
 
 redis_feed = redis.Redis(host='localhost', port=6379, db=0)
-# publish new music in the channel epic_music
 
 def brownianMotion(T, mu, sigma, dt, S0):
     N = round(T/dt)
@@ -23,13 +23,13 @@ def brownianMotion(T, mu, sigma, dt, S0):
 
 S0 = 20000
 S_feed = [S0]
-while True:
+# while True:
+def send_feed():
+    threading.Timer(1.0, send_feed).start()
     S = brownianMotion(2, 0, 0.1, 0.01, 20000)
     S_feed.append(round((S[0]),2))
     S_feed.pop(0)
     final_S = S_feed[-1]
-
-    time.sleep(1)
     date_time = datetime.now()
     current_time = date_time.strftime("%m/%d/%Y, %H:%M:%S")
     feed = {
@@ -38,8 +38,10 @@ while True:
         }
     print(feed)
     redis_feed.publish('price feed', json.dumps(feed))
-    plt.scatter(current_time, final_S, linestyle='--')
-    plt.pause(1)
+    # plt.scatter(current_time, final_S, linestyle='--')
+    # plt.pause(1)
+
+send_feed()
 
 plt.show()
 
@@ -51,4 +53,4 @@ plt.show()
 
 
 # in another terminal:
-    # python test_feed_sender.py
+    # python feed.py
