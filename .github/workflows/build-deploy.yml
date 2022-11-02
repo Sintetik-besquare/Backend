@@ -28,8 +28,8 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Make .env file
-        uses: SpicyPizza/create-envfile@v1.3
+      - name: Create .env file
+        uses: SpicyPizza/create-envfile@v1.3.0
         with:
           envkey_DEBUG: false
           envkey_SECRET: ${{ secrets.SECRET }}
@@ -38,6 +38,12 @@ jobs:
           directory: Backend
           file_name: .env
           fail_on_empty: true
+        run: |
+          touch .env
+          echo envkey_SECRET >> .env
+          echo envkey_POSTGRES_USER >> .env
+          echo envkey_POSTGRES_PASSWORD >> .env
+          cat .env
 
       - name: Running Docker compose
         run: |
