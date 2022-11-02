@@ -16,7 +16,7 @@ services:
     ports:
       - "3001:3001"
     volumes: 
-      - /home/kathleen/Desktop/Backend/server:/usr/src/app
+      - /home/kaithleen/Desktop/Backend/server:/usr/src/app
     container_name: nodejs
     tty: true
 
