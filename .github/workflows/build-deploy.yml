@@ -6,7 +6,7 @@ name: CI/CD Pipeline to DigitalOcean server
 on:
   # Triggers the workflow on push events but only for the "master" branch
   push:
-    branches: [ "master" ]
+    branches: ["master"]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -28,25 +28,25 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      # - name: Running Docker compose
-      #   run: |
-      #   docker compose --env-file .env up --build
+      - name: Running Docker compose
+        run: |
+          docker compose --env-file .env up --build
 
       - name: CI Setup in the server folder
         run: |
-        cd server
-        npm install
+          cd server
+          npm install
 
       - name: CI Exec in the server folder
         run: |
-        npm run build
+          npm run build
 
       - name: CI Setup in the server2 folder
         run: |
-        cd ../server2
-        npm install
-        pip install -r requirements.txt
+          cd ../server2
+          npm install
+          pip install -r requirements.txt
 
       - name: CI Exec in the server2 folder
         run: |
-        npm run build
+          npm run build
