@@ -39,11 +39,10 @@ const userController = {
                 errors 
             });
         };
-
         
         //get user's hashed password
          const newUserCredential = await queryByPromise(
-            `select * from users.credential where email='${email}'`);
+            `select email from users.credential where email='${email}'`);
         const hashPassword = newUserCredential.result[0].password;
         //matching password
         const match = await bcrypt.compare(password, hashPassword)

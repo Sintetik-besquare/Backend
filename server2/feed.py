@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 import redis
 import json
 
+
 redis_feed = redis.Redis(host='localhost', port=6379, db=0)
 # publish new music in the channel epic_music
 
@@ -38,8 +39,10 @@ while True:
         }
     print(feed)
     redis_feed.publish('price feed', json.dumps(feed))
-    plt.scatter(current_time, final_S, linestyle='--')
-    plt.pause(1)
+    stream_name="sintetik_feed"
+    redis_feed.xadd(stream_name,feed)
+    #plt.scatter(current_time, final_S, linestyle='--')
+    # plt.pause(1)
 
 plt.show()
 

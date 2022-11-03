@@ -3,7 +3,7 @@ POST http://localhost:3001/user/signup HTTP/1.1
 content-type: application/json
 
 {
-    "email": "kath94@gmail.com",
+    "email": "kath102@gmail.com",
     "password": "Abcd1234!"
 }
 ### Login
@@ -11,6 +11,6 @@ POST http://localhost:3001/user/login HTTP/1.1
 content-type: application/json
 
 {
-    "email": "kath93@gmail.com",
+    "email": "kath102@gmail.com",
     "password": "Abcd1234!"
 }
