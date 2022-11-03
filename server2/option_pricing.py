@@ -23,8 +23,9 @@ def bs_binary_option(St, K, sigma , delta_t, r, d, option_type):
 
 
 stake = 15
+ticks = 1
 comm = 0.012
-contract_unit_price = bs_binary_option(St = 6135.34, K = 6135.34, sigma = 1, delta_t = 1/(60*24*365), r = 0, d = 0, option_type = "call") + comm
+contract_unit_price = bs_binary_option(St = 6135.34, K = 6135.34, sigma = 1, delta_t = ticks/(60*60*24*365), r = 0, d = 0, option_type = "call") + comm
 n_contract = stake / contract_unit_price
 payout = 1 * n_contract
 print("Rise payout = $ {:.2f}".format(payout))

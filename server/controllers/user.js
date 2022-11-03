@@ -1,55 +1,59 @@
-//list of function of endpoint for user
-//example
+const { queryByPromise } = require('../dbconfig/db');
+const bcrypt = require('bcrypt');
+const validator =require('validator');
+const jwt = require('jsonwebtoken');
+
+const createToken= (user_id)=>{
+    return jwt.sign({user_id},process.env.SECRET,{expiresIn:'3d'})
+};
+
 const userController = {
-    
-    getAll: async (req,res)=>{
-        return res.status(200).json({sucess: true, message:'Created first API endpoint!'})
-    },
-    getById: async (req,res)=>{
-        const {id} = req.params;
-        return res.status(200).json({sucess: true, message:`Created first API endpoint! ${id}`})
-    },
-    createUser: async (req,res)=>{
-        const {id,firstname,lastname,userType} = req.body;
+    //login user
+    loginUser: async (req,res)=>{
+        const {email,password} = req.body;
 
         //validation
         let errors = {};
         let errorMessage ='';
         let isBodyValid = true;
 
-        //firstname
-        if (!firstname||
-            typeof firstname !=='string'||
-            firstname.trim().length ===0){
+        //check empty field
+        if(!email || !password){
             isBodyValid = false;
-            errors['firstname'] = "Input must be a string and not empty";
+            errors['email'] = "Email cannot be empty";
+            errors['password'] = "Password cannot be empty";
+        };
+        
+        //check whether the email exist
+         const check = {
+            text: "select * from users.credential where email=$1",
+            values: [email]
+        };
+        const user_email = await queryByPromise(check);
+        if (user_email.result.length===0) {
+            isBodyValid = false;
+            errors['email'] = "Incorrect email";
+            return res.status(400).json({
+                sucess: false,
+                errorMessage: 'Please enter a valid input',
+                errors 
+            });
         };
 
-        //lastname
-        if (!lastname ||
-            typeof lastname !=='string'||
-            lastname.trim().length ===0){
-            isBodyValid = false;
-            errors['lastname'] = "Input must be a string and not empty";
-        };
+        
+        //get user's hashed password
+         const newUserCredential = await queryByPromise(
+            `select * from users.credential where email='${email}'`);
+        const hashPassword = newUserCredential.result[0].password;
+        //matching password
+        const match = await bcrypt.compare(password, hashPassword)
 
-        //user type
-        if (!userType ||
-            typeof userType !=='string'||
-            userType.trim().length ===0){
+        if(!match){
             isBodyValid = false;
-            errors['userType'] = "Input must be a string and not empty";
-        }else{
-            const checks = ['user','admin'];
-            //to make sure the user type is either user/admin only
-            const found = checks.some((check)=>check===userType);
-            //if the user type is not user/admin 
-            if(!found){
-                isBodyValid = false;
-                errors['userType'] = "Input only can have these value " + checks.join(', ');
-            }
-        };
+            errors['password'] = "Incorrect password";
+        }
 
+        //if got error respond with error 
         if(!isBodyValid){
             return res.status(400).json({
                 sucess: false,
@@ -58,26 +62,82 @@ const userController = {
             });
         };
 
-        //todo: add more validation or use a validation library 
-        
-        //create user
-        const userPayload = {
-            id,
-            firstname,
-            lastname,
-            userType
-        }
-        return res.status(200).json({sucess: true, message:`Created first API endpoint! ${id}. Data:`,userPayload})
-        
-        
-    },
-    updateUser:(req,res)=>{
-        //todo
-    },
-    deleteUser:(req,res)=>{
-       //todo
-    },
-}
+        //get user id
+        const UserCredential = await queryByPromise(
+            `select * from users.credential where email='${email}'`);
+        const user_id = UserCredential.result[0].user_id;
 
+        //create token
+        const token = createToken(user_id);
+
+        return res.status(200).json({status: true, message:"login successfully!",email:email, token:token});
+
+    },
+    //signup user
+    signupUser: async (req,res)=>{
+        const {email,password} = req.body;
+
+        //validation
+        let errors = {};
+        let errorMessage ='';
+        let isBodyValid = true;
+
+        //check empty field
+        if(!email || !password){
+            isBodyValid = false;
+            errors['email'] = "Email cannot be empty";
+            errors['password'] = "Password cannot be empty";
+        };
+        //check email format
+        if(!validator.isEmail(email)){
+            isBodyValid = false;
+            errors['email'] = "Email is not valid";
+        };
+        //check password strength
+        if(!validator.isStrongPassword(password)){
+            isBodyValid = false;
+            errors['password'] = "Password must consist at leats 8 characters, 1 lowercast, 1 uppercases, 1 numbers and 1 symbols";
+        }
+        //check whether email already exist 
+        const check = {
+            text: "select * from users.credential where email=$1",
+            values: [email]
+        };
+        const user_email = await queryByPromise(check);
+        if (user_email.result.length!==0) {
+            isBodyValid = false;
+            errors['email'] = "Duplicated email";
+        };
+        
+        //if got error respond with error 
+        if(!isBodyValid){
+            return res.status(400).json({
+                sucess: false,
+                errorMessage: 'Please enter a valid input',
+                errors 
+            });
+        };
+
+        //hash the password before storing it into the db
+        const salt = await bcrypt.genSalt(10);
+        const hash = await bcrypt.hash(password,salt);
+        
+        //store user email & password to db
+        const my_query = {
+            text: `INSERT INTO users.credential (email, password) VALUES($1,$2)`,
+            values: [email,hash]
+        };
+        const newUser = await queryByPromise(my_query);
+
+        //get user id
+        const newUserCredential = await queryByPromise(
+            `select * from users.credential where email='${email}'`);
+        const user_id = newUserCredential.result[0].user_id;
+
+        //create token
+        const token = createToken(user_id);
+        return res.status(200).json({status:true, message:"signup successfully!", email:email, token:token})
+    }
+};
 
 module.exports = userController;
