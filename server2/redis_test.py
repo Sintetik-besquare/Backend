@@ -28,7 +28,7 @@ import os
 import redis
 import json
 
-from twilio.rest import Client
+# from twilio.rest import Client
 from multiprocessing import Process
 
 redis_conn = redis.Redis(charset="utf-8", decode_responses=True) # create Redis connection
@@ -38,23 +38,22 @@ def sub(name: str):
     pubsub = redis_conn.pubsub()
     pubsub.subscribe("price feed")
     for message in pubsub.listen(): # continuously listens to subcribed channels
-        if message.get("type") == "message":
+        if message.get("type") == "message": # blocks execution and waits for a new message to arrive on the channel.
             data = json.loads(message.get("data"))
-            print("%s : %s" % (name, data))
 
-            # account_sid = os.environ.get("TWILIO_ACCOUNT_SID")
-            # auth_token = os.environ.get("TWILIO_AUTH_TOKEN")
-
-            # body = data.get("message")
-            # from_ = data.get("from")
-            # to = data.get("to")
             price = data.get("price")
             time = data.get("timestamp")
 
-            # client = Client(account_sid, auth_token)
-            # message = client.messages.create(price = price, time = time)
             print(price, time)
 
-
+# To run the sub:
 if __name__ == "__main__":
     Process(target=sub, args=("reader1",)).start()
+
+# use Process here because the event loop generated when we call listen() is blocking, 
+# meaning that we can't do anything else other than waiting for new messages. 
+# For this simple example this blocking is not a problem, 
+# but in a real application where you want to work on other things at the same time it could be.
+
+# OR:
+# sub("reader1")
