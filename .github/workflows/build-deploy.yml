@@ -50,4 +50,4 @@ jobs:
 
       - name: Running Docker compose
         run: |
-          docker compose --env-file .env up --build
+          docker compose --env-file .env up -d --build
