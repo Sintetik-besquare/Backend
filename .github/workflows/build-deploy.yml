@@ -28,18 +28,6 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Create .env file
-        run: |
-          touch .env
-          echo 'SECRET=${{ secrets.SECRET }}' >> .env
-          echo 'POSTGRES_USER=${{ secrets.POSTGRES_USER }}' >> .env
-          echo 'POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}' >> .env
-          cat .env
-
-      - name: Running Docker compose
-        run: |
-          docker compose --env-file .env up --build
-
       - name: CI Setup in the server folder
         run: |
           cd server
@@ -58,3 +46,15 @@ jobs:
       - name: CI Exec in the server2 folder
         run: |
           npm run build
+
+      - name: Create .env file
+        run: |
+          touch .env
+          echo 'SECRET=${{ secrets.SECRET }}' >> .env
+          echo 'POSTGRES_USER=${{ secrets.POSTGRES_USER }}' >> .env
+          echo 'POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}' >> .env
+          cat .env
+
+      - name: Running Docker compose
+        run: |
+          docker compose --env-file .env up --build
