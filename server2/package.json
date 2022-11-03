@@ -1,5 +1,10 @@
 {
   "dependencies": {
-    "mathjs": "^11.3.2"
+    "gaussian": "^1.2.0",
+    "json": "^11.0.0",
+    "linspace": "^1.0.2",
+    "mathjs": "^11.3.2",
+    "redis": "^4.4.0",
+    "scipy": "^0.1.4"
   }
 }
