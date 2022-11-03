@@ -29,7 +29,7 @@ def send_feed():
     S_feed.pop(0)
     final_S = S_feed[-1]
     date_time = datetime.now()
-    current_time = date_time.strftime("%m/%d/%Y, %H:%M:%S")
+    current_time = date_time.strftime('%s')
     feed = {
         'price': final_S,
         'timestamp': current_time,
