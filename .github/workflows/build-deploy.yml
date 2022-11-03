@@ -6,7 +6,7 @@ name: CI/CD Pipeline to DigitalOcean server
 on:
   # Triggers the workflow on push events but only for the "master" branch
   push:
-    branches: [ "master" ]
+    branches: ["master"]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -19,34 +19,35 @@ jobs:
     runs-on: self-hosted
 
     # Steps represent a sequence of tasks that will be executed as part of the job
+
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
-      - name: Setup Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3.4.1
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
         with:
-          node-version: ${{ matrix.node-version }}
-
-      - name: Running Docker compose
-        run: |
-        docker compose --env-file .env up --build
+          node-version: 16.x
 
       - name: CI Setup in the server folder
         run: |
-        cd server
-        npm install
-
-      - name: CI Exec in the server folder
-        run: |
-        npm run build
+          cd server
+          npm install
 
       - name: CI Setup in the server2 folder
         run: |
-        cd ../server2
-        npm install
-        pip install -r requirements.txt
+          cd server2
+          npm install
+          pip install -r requirements.txt
 
-      - name: CI Exec in the server2 folder
+      - name: Create .env file
         run: |
-        npm run build
+          touch .env
+          echo 'SECRET=${{ secrets.SECRET }}' >> .env
+          echo 'POSTGRES_USER=${{ secrets.POSTGRES_USER }}' >> .env
+          echo 'POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}' >> .env
+          cat .env
+
+      - name: Running Docker compose
+        run: |
+          docker compose --env-file .env up --build
