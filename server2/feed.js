@@ -1,14 +1,16 @@
-var linspace = require('linspace');
-var redis = require("redis");
-var Gaussian = require('gaussian');
-var math = require('mathjs');
+require('dotenv').config();
+const linspace = require('linspace');
+const math = require('mathjs');
+const Redis = require('ioredis');
+const env =process.env;
+const { queryByPromise } = require('./dbconfig/db');
+const redis = new Redis({
+  host:'redis',
+  port:env.REDIS_PORT
+});
 
-var S0, S_feed;
-const redis_feed = redis.createClient();
-redis_feed.connect()
-
-function brownianMotion(T, mu, sigma, dt, S0) {
-  var N, t;
+function brownianMotion(T, mu, sigma, dt) {
+  let N, t;
   S = [];
   W = [];
   X = [];
@@ -37,24 +39,43 @@ function brownianMotion(T, mu, sigma, dt, S0) {
   return S;
 }
 
-S0 = 20000;
-S_feed = [S0];
+let S0 = 20000;
+let S_feed = [S0];
+
 
 function send_feed() {
-  var S, feed, final_S;
-  S = brownianMotion(2, 0, 0.1, 0.01, 20000);
-  S_feed.push(S[0].toFixed(2));
-  S_feed.shift();
-  final_S = S_feed.slice(-1)[0];
-  let current_time = Date.now();
-  feed = {
-    "price": final_S,
-    "timestamp": current_time,
-    "symbol_name": "Volatility 10 (1s)"
-  };
-  console.log(feed);
-  (async () => {await redis_feed.publish("price feed", JSON.stringify(feed));})
-  
-}
 
+let S, feed, final_S;
+S = brownianMotion(2, 0, 0.1, 0.01);
+S_feed.push(S[0].toFixed(2));
+S_feed.shift();
+final_S = S_feed.slice(-1)[0];
+let current_time = Math.floor(Date.now()/1000) ;
+feed = {
+  "price": final_S,
+  "timestamp": current_time,
+  "symbol_name": "Volatility 10 (1s)"
+};
+
+( async () => {
+console.log(feed);
+await redis.publish("price feed", JSON.stringify(feed));
+
+//store data to redis stream
+await redis.xadd("price feed","MAXLEN","86400", "*","price",feed.price,"timestamp",feed.timestamp,"symbol_name",feed.symbol_name);
+
+//store data to postgres
+const my_query = 
+`
+BEGIN;
+INSERT INTO feed.symbol (symbol_name) VALUES('${feed.symbol_name}') ON CONFLICT DO NOTHING;
+INSERT INTO feed.symbol_price (price,ts) VALUES('${feed.price}','${feed.timestamp}');
+COMMIT;
+`;
+const newUser = await queryByPromise(my_query);
+
+})();
+
+};
 setInterval(send_feed, 1000);
+
