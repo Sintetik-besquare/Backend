@@ -16,8 +16,6 @@ services:
       - SECRET=${SECRET}
     ports:
       - "3001:3001"
-    volumes:
-      - /home/kaithleen/Desktop/Backend/server:/usr/src/app
     container_name: mainservice
     tty: true
 
@@ -36,8 +34,6 @@ services:
       - POSTGRES_DB=sintetik
     ports:
       - "3002:3002"
-    # volumes:
-    #   - /home/kaithleen/Desktop/Backend/server2:/usr/src/app
     container_name: feedservice
     tty: true
 
