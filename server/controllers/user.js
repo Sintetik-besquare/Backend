@@ -14,7 +14,6 @@ const userController = {
 
         //validation
         let errors = {};
-        let errorMessage ='';
         let isBodyValid = true;
 
         //check empty field
@@ -42,9 +41,12 @@ const userController = {
         
         //get user's hashed password
          const newUserCredential = await queryByPromise(
-            `select email from users.credential where email='${email}'`);
+            `select password from users.credential where email='${email}'`);
         const hashPassword = newUserCredential.result[0].password;
         //matching password
+        console.log(password);
+        console.log(hashPassword);
+        console.log(newUserCredential);
         const match = await bcrypt.compare(password, hashPassword)
 
         if(!match){
