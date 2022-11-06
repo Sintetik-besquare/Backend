@@ -7,9 +7,6 @@ const cors = require('cors');
 //list of all available routes
 const userRouter = require('./routes/user');
 
-// const decode = require('./middlewares/jwt');
-
-
 //get port from environment and store in Express. 
 const port = 3001;
 const app = express(); 
@@ -29,8 +26,6 @@ app.use(express.urlencoded({extended: true}))
 //API endpoint example
 app.use('/user',userRouter);
 
-
-
 //Error for invalid API endpoint
 app.use('*', (req, res) => {
     return res.status(404).json({
@@ -41,6 +36,7 @@ app.use('*', (req, res) => {
 
 //create backend server
 const server = http.createServer(app);
+
 //backend server is listening on port 3001
 server.listen(port,()=>{
     console.log(`Server is running on ${port}`)
