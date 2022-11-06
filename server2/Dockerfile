@@ -1,15 +1,13 @@
-From ubuntu:latest
-# FROM python:3-onbuild
-
-RUN apt update
-RUN apt install python3 -y
+From node:18-alpine
 
 WORKDIR /usr/src/app
 
-# COPY requirements.txt requirements.txt
-# RUN pip install --no-cache-dir -r requirements.txt
-# RUN python -m pip install redis
+COPY package.json /usr/src/app
 
-COPY main.py /usr/src/app
+RUN npm install
 
-CMD ["python3","./main.py"]
+COPY . /usr/src/app
+
+EXPOSE 3002
+
+CMD ["npm","start"]
