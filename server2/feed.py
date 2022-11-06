@@ -36,13 +36,13 @@ def send_feed():
         'symbol_name': str("Volatility 10 (1s)")
         }
     print(feed)
-    redis_feed.publish('price feed', json.dumps(feed))
-    # plt.scatter(current_time, final_S, linestyle='--')
+    # redis_feed.publish('price feed', json.dumps(feed))
+    plt.scatter(current_time, final_S, linestyle='--')
     # plt.pause(1)
 
 send_feed()
 
-# plt.show()
+plt.show()
 
 
 # in terminal:
