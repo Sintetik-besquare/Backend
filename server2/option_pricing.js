@@ -26,9 +26,9 @@ function bs_binary_option(St, K, sigma, delta_t, r, d, option_type) {
 }
 
 stake = 15;
-ticks = 1
+ticks = 10;
 comm = 0.012;
-contract_unit_price = bs_binary_option(6135.34, 6135.34, 1, (ticks / (60 * 60 * 24 * 365)), 0, 0, "put") + comm;
+contract_unit_price = bs_binary_option(6135.34, 6135.34, 1, (ticks / (60 * 60 * 24 * 365)), 0, 0, "call") + comm;
 n_contract = stake / contract_unit_price;
 payout = 1 * n_contract;
 console.log("Rise payout = " + payout.toFixed(2));
