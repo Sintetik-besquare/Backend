@@ -5,6 +5,7 @@ services:
       context: ./server
     depends_on:
       - postgres
+      - redis
     networks:
       - network
     environment:
@@ -15,18 +16,15 @@ services:
       - SECRET=${SECRET}
     ports:
       - "3001:3001"
-    # volumes:
-    #   - /var/www/sintetik/_work/Backend/Backend/server:/usr/src/app
-    container_name: nodejs
+    container_name: mainservice
     tty: true
 
   feed_service:
     build:
       context: ./server2
-    command: python3 ./main.py
     depends_on:
       - postgres
-      - feed_redis
+      - redis
     networks:
       - network
     environment:
@@ -34,16 +32,21 @@ services:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=sintetik
-    container_name: mainpy
+    ports:
+      - "3002:3002"
+    container_name: feedservice
     tty: true
 
-  feed_redis:
-    image: "bitnami/redis:latest"
+  redis:
+    restart: always
+    image: "redis:7.0.0"
     networks:
       - network
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
-    container_name: feed_redis
+    volumes:
+      - ../redis_mount:/bitnami/redis/data
+    container_name: redis
 
   postgres:
     restart: always
@@ -52,7 +55,7 @@ services:
       - network
     volumes:
       - ../db_mount:/var/lib/postgresql/data
-      - ./server/db_init/:/docker-entrypoint-initdb.d/
+      - ./db_init/:/docker-entrypoint-initdb.d/
     environment:
       - POSTGRES_PORT=5432
       - POSTGRES_USER=${POSTGRES_USER}
@@ -62,3 +65,5 @@ services:
 
 networks:
   network:
+
+    
