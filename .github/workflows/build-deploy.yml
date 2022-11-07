@@ -34,12 +34,6 @@ jobs:
           cd server
           npm install
 
-      - name: CI Setup in the server2 folder
-        run: |
-          cd server2
-          npm install
-          pip install -r requirements.txt
-
       - name: Create .env file
         run: |
           touch .env
