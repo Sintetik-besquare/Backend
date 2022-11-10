@@ -194,6 +194,6 @@ class Contract {
 
 module.exports = Contract;
 
-//all entry time and exit time will still hv 1 sec delay then the actual time(sometimes...)
+//all entry time and exit time will still hv 1 sec delay(sometimes...)
 //even frontend send with price we still have to veriify it with db
 //which is impossible as you can't write & read at the same time
