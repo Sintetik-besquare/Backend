@@ -12,7 +12,7 @@ const app = express();
 //log all request and error in development mode
 //this might need to move the very begining of route declaration
 app.use(morgan('dev'));
-
+app.use(cors());
 //allow user to send req jason format
 app.use(express.json());
 //allow user to send req in nested jason format
@@ -49,18 +49,26 @@ const io = require('socket.io')(server,{
   });
 
 //connect to socketio 
-io.on('connection',(socket)=>{
-    console.log("Client connected!!!!");
-    ( async () => {
-      await redis.subscribe("price feed");
-      await redis.on("message",(channel,message)=>{
-        console.log(message);
-        socket.emit("getfeed",message);
-      })
-    })();
-    socket.on("disconnect",()=>{
-      console.log("Client disconnected")
+io.on('connection', async (socket)=>{
+  socket.on("socket1",(arg)=>{
+    console.log(arg);
+  })
+  console.log("Client connected!!!!",socket.id);
+
+  //get selected symbol from frontend
+  //multiple subscribe channel
+  await redis.subscribe("price feed");
+  await redis.on("message",(channel,message)=>{
+    //console.log(message);
+    //console.log(message, socket.id);
+    socket.emit("getfeed",message);
+    //frontend will socket.on("selected channel")
+     
+      });
+    io.on("disconnect",async ()=>{
+      console.log("Client disconnected");
     })  
+    
   });
 
 //feed server is listening on port 3002
