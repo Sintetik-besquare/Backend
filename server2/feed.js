@@ -58,7 +58,7 @@ feed = {
 };
 
 ( async () => {
-console.log(feed);
+//console.log(feed);
 await redis.publish("price feed", JSON.stringify(feed));
 
 //store data to redis stream
@@ -67,15 +67,11 @@ await redis.xadd("price feed","MAXLEN","86400", "*","price",feed.price,"timestam
 //store data to postgres
 const my_query = 
 `
-BEGIN;
-INSERT INTO feed.symbol (symbol_name) VALUES('${feed.symbol_name}') ON CONFLICT DO NOTHING;
-INSERT INTO feed.symbol_price (price,ts) VALUES('${feed.price}','${feed.timestamp}');
-COMMIT;
+CALL storeFeed('${feed.symbol_name}','${feed.price}','${feed.timestamp}');
 `;
-const newUser = await queryByPromise(my_query);
+await queryByPromise(my_query);
 
 })();
 
 };
 setInterval(send_feed, 1000);
-
