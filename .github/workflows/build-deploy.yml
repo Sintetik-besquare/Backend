@@ -34,18 +34,15 @@ jobs:
           cd server
           npm install
 
-      - name: CI Setup in the server2 folder
-        run: |
-          cd server2
-          npm install
-          pip install -r requirements.txt
-
       - name: Create .env file
         run: |
           touch .env
           echo 'SECRET=${{ secrets.SECRET }}' >> .env
           echo 'POSTGRES_USER=${{ secrets.POSTGRES_USER }}' >> .env
           echo 'POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}' >> .env
+          echo 'PGADMIN_DEFAULT_EMAIL=${{ secrets.PGADMIN_DEFAULT_EMAIL }}' >> .env
+          echo 'PGADMIN_DEFAULT_PASSWORD=${{ secrets.POSTGRES_DEFAULT_PASSWORD }}' >> .env
+          echo 'REDIS_PORT=${{ secrets.REDIS_PORT }}' >> .env
           cat .env
 
       - name: Running Docker compose
