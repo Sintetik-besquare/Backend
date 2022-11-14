@@ -65,7 +65,7 @@ io.on('connection', async (socket)=>{
     //frontend will socket.on("selected channel")
      
       });
-    io.on("disconnect",async ()=>{
+    socket.on("disconnect",async ()=>{
       console.log("Client disconnected");
     })  
     

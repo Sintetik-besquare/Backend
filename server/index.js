@@ -7,7 +7,7 @@ const { queryByPromise } = require("./dbconfig/db");
 
 //list of all available routes
 const userRouter = require("./routes/user");
-
+const accountRouter = require("./routes/account");
 //get port from environment and store in Express.
 const port = 3001;
 const app = express();
@@ -26,7 +26,7 @@ app.use(express.urlencoded({ extended: true }));
 
 //API endpoints
 app.use("/user", userRouter);
-
+app.use("/account", accountRouter);
 //Error for invalid API endpoint
 app.use("*", (req, res) => {
   return res.status(404).json({
@@ -77,7 +77,7 @@ io.on("connection", async (socket) => {
   //get client id from payload
   const client_id = socket.data;
 
-  socket.on("call", async (data) => {
+  socket.on("order", async (data) => {
     let { index, stake, ticks, option_type, entry_time } = data;
     console.log(data);
     //to test
@@ -90,7 +90,7 @@ io.on("connection", async (socket) => {
     //   5,
     //   current_time
     // );
-    //actual code
+    // actual code
       const contract = new Contract(
       index,
       client_id,
@@ -131,7 +131,7 @@ io.on("connection", async (socket) => {
    
   });
 
-  io.on("disconnect", () => {
+  socket.on("disconnect", () => {
     console.log("Client disconnected");
   });
 });
