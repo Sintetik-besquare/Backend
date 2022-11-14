@@ -3,7 +3,7 @@ POST http://localhost:3001/user/signup HTTP/1.1
 content-type: application/json
 
 {
-    "email": "kath163@gmail.com",
+    "email": "kath26@gmail.com",
     "password": "Abcd1234!"
 }
 ### Login
@@ -11,14 +11,14 @@ POST http://localhost:3001/user/login HTTP/1.1
 content-type: application/json
 
 {
-    "email": "kath163@gmail.com",
-    "password": "AAAbcd1234!!_"
+    "email": "kath26@gmail.com",
+    "password": "Abcd1234!"
 
 }
 ### reset userbalance
-POST http://localhost:3001/user/resetBalance HTTP/1.1
+POST http://localhost:3001/account/resetBalance HTTP/1.1
 content-type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1iIsInR5cCI6IkpXVCJ9.eyJjbGllbnRfaWQiOiI0IiwiaWF0IjoxNjY4MDk0NDI0LCJleHAiOjE2NjgxODA4MjR9.RcCSE5o8bzDywg22l6VVoJBDuDdfke_dSs3yHi3KPBk
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnRfaWQiOiIxIiwiaWF0IjoxNjY4NDA1NjUyLCJleHAiOjE2Njg0OTIwNTJ9.IpofdiwWVl6I9yDHWse2qfpKiytLMeZhtw1KN1B_VQE
 
 {
 
@@ -26,21 +26,44 @@ Authorization: Bearer eyJhbGciOiJIUzI1iIsInR5cCI6IkpXVCJ9.eyJjbGllbnRfaWQiOiI0Ii
 }
 
 ### get userbalance
-GET http://localhost:3001/user/getBalance HTTP/1.1
+GET http://localhost:3001/account/getBalance HTTP/1.1
 content-type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnRfaWQiOiI0IiwiaWF0IjoxNjY4MDk0NDI0LCJleHAiOjE2NjgxODA4MjR9.RcCSE5o8bzDywg22l6VVoJBDuDdfke_dSs3yHi3KPBk
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnRfaWQiOiIxIiwiaWF0IjoxNjY4NDA1NjUyLCJleHAiOjE2Njg0OTIwNTJ9.IpofdiwWVl6I9yDHWse2qfpKiytLMeZhtw1KN1B_VQE
 
 ### get userTransaction
-GET http://localhost:3001/user/getTransaction HTTP/1.1
+GET http://localhost:3001/account/getTransaction HTTP/1.1
 content-type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnRfaWQiOiI0IiwiaWF0IjoxNjY4MDk0NDI0LCJleHAiOjE2NjgxODA4MjR9.RcCSE5o8bzDywg22l6VVoJBDuDdfke_dSs3yHi3KPBk
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnRfaWQiOiIxIiwiaWF0IjoxNjY4NDA1NjUyLCJleHAiOjE2Njg0OTIwNTJ9.IpofdiwWVl6I9yDHWse2qfpKiytLMeZhtw1KN1B_VQE
+
+### get userContractSummary
+GET http://localhost:3001/account/getContractSummary HTTP/1.1
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnRfaWQiOiIxIiwiaWF0IjoxNjY4NDA1NjUyLCJleHAiOjE2Njg0OTIwNTJ9.IpofdiwWVl6I9yDHWse2qfpKiytLMeZhtw1KN1B_VQE
+
 
 ### reset password
-POST http://localhost:3001/user/resetPassword HTTP/1.1
+POST http://localhost:3001/account/resetPassword HTTP/1.1
 content-type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnRfaWQiOiI0IiwiaWF0IjoxNjY4MDk0NDI0LCJleHAiOjE2NjgxODA4MjR9.RcCSE5o8bzDywg22l6VVoJBDuDdfke_dSs3yHi3KPBk
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnRfaWQiOiIxIiwiaWF0IjoxNjY4NDA1NjUyLCJleHAiOjE2Njg0OTIwNTJ9.IpofdiwWVl6I9yDHWse2qfpKiytLMeZhtw1KN1B_VQE
 
 {
     "old_password": "Abcd1234!",
-    "new_password": "AAAbcd1234!!_"
+    "new_password": "AAAbcd1234!!_",
+    "new_password_confirmation": "AAAbcd1234!!_"
+}
+
+### edit user details
+POST http://localhost:3001/account/editUserDetails HTTP/1.1
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnRfaWQiOiIxIiwiaWF0IjoxNjY4NDA1NjUyLCJleHAiOjE2Njg0OTIwNTJ9.IpofdiwWVl6I9yDHWse2qfpKiytLMeZhtw1KN1B_VQE
+
+{
+    "firstname":"lim",
+    "lastname":"kath",
+    "gender": "Female",
+    "residence":"Malaysia",
+    "occupation":"Student",
+    "age":"19",
+    "education":"Tertiary"
+
 }

@@ -18,13 +18,13 @@ CREATE TABLE IF NOT EXISTS feed.symbol_price(
 
 CREATE TABLE IF NOT EXISTS client.account(
     client_id bigserial primary key,
-    fist_name varchar(255),
+    first_name varchar(255),
     last_name varchar(255),
     gender varchar(50),
     residence varchar(255),
     occupation varchar(255),
     date_join bigint,
-    age_range varchar(50),
+    age numeric(2),
     email varchar(255) NOT NULL,
     password varchar(255) NOT NULL,
     education varchar(50),
@@ -105,11 +105,15 @@ LANGUAGE plpgsql
 AS $$
 BEGIN
     UPDATE client.account SET balance = balance-"premium" WHERE client_id = "clientid";
-    INSERT INTO client.contract_summary (symbol,contract_type,option_type,duration,stake,entry_time,entry_spot,client_id)
-    VALUES("index","contracttype","optiontype","ticks","premium","entrytime","entryspot","clientid");
+    
+    WITH ins AS (
+        INSERT INTO client.contract_summary (symbol,contract_type,option_type,duration,stake,entry_time,entry_spot,client_id)
+        VALUES("index","contracttype","optiontype","ticks","premium","entrytime","entryspot","clientid")
+        RETURNING contract_id
+    )
     INSERT INTO client.transaction (transaction_time,transaction_type,transaction_amount,balance,contract_id,client_id)
     VALUES("entrytime","transactiontype","premium",(SELECT balance FROM client.account WHERE client_id = "clientid"),
-    (SELECT contract_id FROM client.contract_summary WHERE client_id="clientid" AND entry_time="entrytime"),"clientid");
+    (SELECT contract_id FROM ins),"clientid");
     COMMIT;
 END;
 $$;
@@ -130,11 +134,10 @@ AS $$
 BEGIN
     UPDATE client.account SET balance = balance+"contrectpayout" WHERE client_id = "clientid";
     UPDATE client.contract_summary SET exit_time="exittime", exit_spot="exitspot",payout="contrectpayout" 
-    WHERE contract_id=(SELECT contract_id FROM client.contract_summary WHERE client_id="clientid" AND entry_time="entrytime");
+    WHERE contract_id="contractid";
     INSERT INTO client.transaction (transaction_time,transaction_type,transaction_amount,balance,contract_id,client_id)
     VALUES("exittime","transactiontype","contrectpayout",(SELECT balance FROM client.account WHERE client_id = "clientid"),
     "contractid","clientid");
     COMMIT;
 END;
 $$;
-
