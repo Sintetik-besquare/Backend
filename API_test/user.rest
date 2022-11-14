@@ -3,7 +3,7 @@ POST http://localhost:3001/user/signup HTTP/1.1
 content-type: application/json
 
 {
-    "email": "kath26@gmail.com",
+    "email": "kath27@gmail.com",
     "password": "Abcd1234!"
 }
 ### Login
@@ -11,14 +11,14 @@ POST http://localhost:3001/user/login HTTP/1.1
 content-type: application/json
 
 {
-    "email": "kath26@gmail.com",
+    "email": "kath27@gmail.com",
     "password": "Abcd1234!"
 
 }
 ### reset userbalance
 POST http://localhost:3001/account/resetBalance HTTP/1.1
 content-type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnRfaWQiOiIxIiwiaWF0IjoxNjY4NDA1NjUyLCJleHAiOjE2Njg0OTIwNTJ9.IpofdiwWVl6I9yDHWse2qfpKiytLMeZhtw1KN1B_VQE
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnRfaWQiOiIyIiwiaWF0IjoxNjY4NDExOTA0LCJleHAiOjE2Njg0OTgzMDR9.sqEho0lCQE2HYcOOVrvQ18dUik7JxjX5sgM_02Hu8dU
 
 {
 
@@ -28,23 +28,23 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnRfaWQiOiIxI
 ### get userbalance
 GET http://localhost:3001/account/getBalance HTTP/1.1
 content-type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnRfaWQiOiIxIiwiaWF0IjoxNjY4NDA1NjUyLCJleHAiOjE2Njg0OTIwNTJ9.IpofdiwWVl6I9yDHWse2qfpKiytLMeZhtw1KN1B_VQE
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnRfaWQiOiIyIiwiaWF0IjoxNjY4NDExOTA0LCJleHAiOjE2Njg0OTgzMDR9.sqEho0lCQE2HYcOOVrvQ18dUik7JxjX5sgM_02Hu8dU
 
 ### get userTransaction
 GET http://localhost:3001/account/getTransaction HTTP/1.1
 content-type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnRfaWQiOiIxIiwiaWF0IjoxNjY4NDA1NjUyLCJleHAiOjE2Njg0OTIwNTJ9.IpofdiwWVl6I9yDHWse2qfpKiytLMeZhtw1KN1B_VQE
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnRfaWQiOiIyIiwiaWF0IjoxNjY4NDExOTA0LCJleHAiOjE2Njg0OTgzMDR9.sqEho0lCQE2HYcOOVrvQ18dUik7JxjX5sgM_02Hu8dU
 
 ### get userContractSummary
 GET http://localhost:3001/account/getContractSummary HTTP/1.1
 content-type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnRfaWQiOiIxIiwiaWF0IjoxNjY4NDA1NjUyLCJleHAiOjE2Njg0OTIwNTJ9.IpofdiwWVl6I9yDHWse2qfpKiytLMeZhtw1KN1B_VQE
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnRfaWQiOiIyIiwiaWF0IjoxNjY4NDExOTA0LCJleHAiOjE2Njg0OTgzMDR9.sqEho0lCQE2HYcOOVrvQ18dUik7JxjX5sgM_02Hu8dU
 
 
 ### reset password
 POST http://localhost:3001/account/resetPassword HTTP/1.1
 content-type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnRfaWQiOiIxIiwiaWF0IjoxNjY4NDA1NjUyLCJleHAiOjE2Njg0OTIwNTJ9.IpofdiwWVl6I9yDHWse2qfpKiytLMeZhtw1KN1B_VQE
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnRfaWQiOiIyIiwiaWF0IjoxNjY4NDExOTA0LCJleHAiOjE2Njg0OTgzMDR9.sqEho0lCQE2HYcOOVrvQ18dUik7JxjX5sgM_02Hu8dU
 
 {
     "old_password": "Abcd1234!",
@@ -52,13 +52,18 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnRfaWQiOiIxI
     "new_password_confirmation": "AAAbcd1234!!_"
 }
 
+### get user details
+GET http://localhost:3001/account/getUserDetails HTTP/1.1
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnRfaWQiOiIyIiwiaWF0IjoxNjY4NDExOTA0LCJleHAiOjE2Njg0OTgzMDR9.sqEho0lCQE2HYcOOVrvQ18dUik7JxjX5sgM_02Hu8dU
+
 ### edit user details
 POST http://localhost:3001/account/editUserDetails HTTP/1.1
 content-type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnRfaWQiOiIxIiwiaWF0IjoxNjY4NDA1NjUyLCJleHAiOjE2Njg0OTIwNTJ9.IpofdiwWVl6I9yDHWse2qfpKiytLMeZhtw1KN1B_VQE
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnRfaWQiOiIyIiwiaWF0IjoxNjY4NDExOTA0LCJleHAiOjE2Njg0OTgzMDR9.sqEho0lCQE2HYcOOVrvQ18dUik7JxjX5sgM_02Hu8dU
 
 {
-    "firstname":"lim",
+    "firstname":"limmm",
     "lastname":"kath",
     "gender": "Female",
     "residence":"Malaysia",
@@ -67,3 +72,4 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnRfaWQiOiIxI
     "education":"Tertiary"
 
 }
+

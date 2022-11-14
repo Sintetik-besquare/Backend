@@ -17,7 +17,12 @@ const userController = {
     };
 
     //get user id
-    const user_id = await queryByPromise(`SELECT client_id FROM client.account WHERE email='${email}'`);
+    const my_query = {
+      text:
+      `SELECT client_id FROM client.account WHERE email=$1;`,
+      values:[email]
+    }
+    const user_id = await queryByPromise(my_query);
 
     //create token
     const token = createToken(user_id.result[0].client_id);
@@ -46,12 +51,21 @@ const userController = {
     const date_join = Math.floor(Date.now()/1000);
 
     //store user email & password to db
-    await queryByPromise(`
-    INSERT INTO client.account (email, password, balance,date_join) 
-    VALUES('${email}','${hash}','${initial_balance}','${date_join}')`,);
+    const my_query = {
+      text:
+      `INSERT INTO client.account (email, password, balance, date_join) 
+      VALUES($1,$2,$3,$4);`,
+      values:[email,hash,initial_balance,date_join]
+    }
+    await queryByPromise(my_query);
 
     //get user id
-    const user_id = await queryByPromise(`SELECT client_id FROM client.account WHERE email='${email}'`);
+    const my_query2 = {
+      text:
+      `SELECT client_id FROM client.account WHERE email=$1;`,
+      values:[email]
+    }
+    const user_id = await queryByPromise(my_query2);
 
     //create token
     const token = createToken(user_id.result[0].client_id);
