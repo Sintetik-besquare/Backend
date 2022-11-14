@@ -10,6 +10,7 @@ router
 .get('/getTransaction',requireAuth,userController.getUserTransaction)
 .get('/getContractSummary',requireAuth,userController.getUserContractSummary)
 .post('/resetPassword',requireAuth,resetPasswordValidation,userController.resetPassword)
+.get('/getUserDetails',requireAuth, userController.getUserDetails)
 .post('/editUserDetails',requireAuth,userDetailsValidation,userController.editUserDetails)
 
 module.exports= router;    

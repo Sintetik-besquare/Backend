@@ -17,13 +17,20 @@ const accountController = {
     let current_time = Math.floor(Date.now() / 1000);
 
     //update transaction and account table
-    await queryByPromise(`
-    CALL updateBalanceAfterReset('${current_time}','ResetBalance','20000','20000','${client_id}')`);
+    const my_query = {
+      text:
+      `CALL updateBalanceAfterReset($1,'ResetBalance','20000','20000',$2);`,
+      values:[current_time,client_id]
+    }
+    await queryByPromise(my_query);
 
     //get user latest balance
-    const user_balance = await queryByPromise(
-      `SELECT balance FROM client.account WHERE client_id = '${client_id}'`
-    );
+    const my_query2 = {
+      text:
+      `SELECT balance FROM client.account WHERE client_id = $1;`,
+      values:[client_id]
+    }
+    const user_balance = await queryByPromise(my_query2);
 
     //return user latest balance
     return res.status(200).json({
@@ -37,9 +44,12 @@ const accountController = {
     const client_id = req.user;
 
     //get user latest balance
-    const user_balance = await queryByPromise(
-      `SELECT balance FROM client.account WHERE client_id = '${client_id}'`
-    );
+    const my_query = {
+      text:
+      `SELECT balance FROM client.account WHERE client_id = $1;`,
+      values:[client_id]
+    }
+    const user_balance = await queryByPromise(my_query);
 
     //return user latest balance
     return res.status(200).json({
@@ -53,9 +63,14 @@ const accountController = {
     const client_id = req.user;
 
     //get user recent 200 transactions
-    const user_transaction = await queryByPromise(
-      `SELECT * FROM client.transaction WHERE client_id = '${client_id}' ORDER BY transaction_time DESC LIMIT 200`
-    );
+    const my_query = {
+      text:
+      `SELECT * FROM client.transaction 
+      WHERE client_id = $1 
+      ORDER BY transaction_time DESC LIMIT 200;`,
+      values:[client_id]
+    }
+    const user_transaction = await queryByPromise(my_query);
 
     return res.status(200).json({
       status: true,
@@ -63,27 +78,19 @@ const accountController = {
       transaction: user_transaction.result,
     });
   },
+  
   getUserContractSummary:async (req, res) => {
     const client_id = req.user;
 
     //get user recent 200 transactions
-    const user_transaction = await queryByPromise(
-      `SELECT * FROM client.contract_summary WHERE client_id = '${client_id}' ORDER BY contract_id DESC LIMIT 200`
-    );
-
-    return res.status(200).json({
-      status: true,
-      message: "successfully retrived user transaction!",
-      transaction: user_transaction.result,
-    });
-  },
-  getUserTransaction: async (req, res) => {
-    const client_id = req.user;
-
-    //get user recent 200 transactions
-    const user_transaction = await queryByPromise(
-      `SELECT * FROM client.transaction WHERE client_id = '${client_id}' ORDER BY transaction_time DESC LIMIT 200`
-    );
+    const my_query = {
+      text:
+      `SELECT * FROM client.contract_summary 
+      WHERE client_id = $1 
+      ORDER BY contract_id DESC LIMIT 200;`,
+      values:[client_id]
+    }
+    const user_transaction = await queryByPromise(my_query);
 
     return res.status(200).json({
       status: true,
@@ -105,29 +112,39 @@ const accountController = {
     const new_hash = await bcrypt.hash(new_password, salt);
  
     //reset user password
-    await queryByPromise(
-      `UPDATE client.account SET password = '${new_hash}' WHERE client_id= '${client_id}'`
-    );
+    const my_query = {
+      text:
+      `UPDATE client.account SET password = $1 WHERE client_id= $2;`,
+      values:[new_hash,client_id]
+    }
+    await queryByPromise(my_query);
 
     return res.status(200).json({
       sucess: true,
       message: "Password successfully reset",
     });
   },
+
   getUserDetails: async (req, res) => {
     const client_id = req.user;
+    const my_query = {
+      text:
+      `SELECT first_name, last_name, gender, residence, 
+      occupation, age, education, date_join
+      FROM client.account WHERE client_id = $1;`,
+      values:[client_id]
+    }
 
     //get user details
-    const user_details = await queryByPromise(
-      `SELECT * FROM client.account WHERE client_id = '${client_id}'`
-    );
+    const user_details = await queryByPromise(my_query);
 
     return res.status(200).json({
       status: true,
       message: "successfully retrived user details!",
-      transaction: user_details.result,
+      user_details: user_details.result,
     });
   },
+
   editUserDetails: async (req, res) => {
     const client_id = req.user;
     const { firstname, lastname, gender, residence, occupation, age, education } = req.body;
@@ -136,11 +153,15 @@ const accountController = {
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     };
-  
-    await queryByPromise(`
-    UPDATE client.account SET first_name='${firstname}', last_name='${lastname}', gender='${gender}',
-     residence='${residence}', occupation='${occupation}', age='${age}', education ='${education}' 
-     WHERE client_id = '${client_id}'`);
+    
+    const my_query = {
+      text:
+      `UPDATE client.account SET first_name=$1, last_name=$2, gender=$3,
+      residence=$4, occupation=$5, age=$6, education =$7 
+      WHERE client_id = $8;`,
+      values:[firstname,lastname,gender,residence,occupation,age,education,client_id]
+    }
+    await queryByPromise(my_query);
 
     return res.status(200).json({
         status: true,
@@ -148,7 +169,5 @@ const accountController = {
       });
   },
 };
-
-// editUserDetails
 
 module.exports = accountController;
