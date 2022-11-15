@@ -58,17 +58,18 @@ feed = {
 };
 
 ( async () => {
-//console.log(feed);
+//publish price feed
 await redis.publish("price feed", JSON.stringify(feed));
 
 //store data to redis stream
 await redis.xadd("price feed","MAXLEN","86400", "*","price",feed.price,"timestamp",feed.timestamp,"symbol_name",feed.symbol_name);
 
 //store data to postgres
-const my_query = 
-`
-CALL storeFeed('${feed.symbol_name}','${feed.price}','${feed.timestamp}');
-`;
+const my_query = {
+  text:`CALL storeFeed($1,$2,$3);`,
+  values:[feed.symbol_name,feed.price,feed.timestamp]
+};
+
 await queryByPromise(my_query);
 
 })();

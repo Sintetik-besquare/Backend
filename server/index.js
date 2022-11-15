@@ -56,10 +56,15 @@ io.use(async (socket, next) => {
   try {
     //get client_id from payload
     const { client_id } = jwt.verify(token, process.env.SECRET);
+    
     //check whether the client_id exist in db
-    const id = await queryByPromise(
-      `select client_id from client.account where client_id='${client_id}'`
-    );
+    const my_query = {
+      text:
+      `select client_id from client.account where client_id=$1;`,
+      values:[client_id]
+    }
+    const id = await queryByPromise(my_query);
+
     //pass client_id to sokect on connection
     socket.data = id.result[0].client_id;
     next();
@@ -79,9 +84,9 @@ io.on("connection", async (socket) => {
 
   socket.on("order", async (data) => {
     let { index, stake, ticks, option_type, entry_time } = data;
-    console.log(data);
+    //console.log(data);
     //to test
-    //let current_time = Math.floor(Date.now() / 1000);
+    // let current_time = Math.floor(Date.now() / 1000);
     // const contract = new Contract(
     //   "Volatility 10 (1s)",
     //   client_id,
@@ -100,10 +105,9 @@ io.on("connection", async (socket) => {
       entry_time
     );
 
-    // const contract = new contract('vol', 12,321)
     let buy_contract = await contract.buy();
     //during buy event just send bk contract id and status
-    console.log(buy_contract);
+    // console.log(buy_contract);
     socket.emit("buy", buy_contract);
     
     if(buy_contract.status){

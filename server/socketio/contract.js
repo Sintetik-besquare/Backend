@@ -36,8 +36,8 @@ class Contract {
     let current_time = current[0][1][3];
     let current_price = current[0][1][1];
 
-    console.log("entry price is ", this.entry_price, "time is", this.entry_time);
-    console.log("current price is ", current_price, "time is", current_time);
+    // console.log("entry price is ", this.entry_price, "time is", this.entry_time);
+    // console.log("current price is ", current_price, "time is", current_time);
 
     if (this.option_type === "call") {
       if (this.entry_price > current_price) {
@@ -63,10 +63,13 @@ class Contract {
   }
 
   async checkBalance() {
-    let balance = await queryByPromise(
-      `SELECT balance FROM client.account 
-            WHERE client_id = '${this.client_id}';`
-    );
+    const my_query = {
+      text:
+      `SELECT balance FROM client.account WHERE client_id = $1;`,
+      values:[this.client_id]
+    };
+    
+    let balance = await queryByPromise(my_query);
 
     if (balance.result[0].balance > this.stake) {
       return (this.isBalance = true);
@@ -125,18 +128,21 @@ class Contract {
   
     //deduct balance with stake and update it to client_account table
     //store buy contract summary
-    await queryByPromise(`
-    CALL updateActiveContract(
-      '${this.index}','${r.contract_type}','${r.option_type}','${r.ticks}',
-      '${r.stake}','${r.entry_time}','${r.entry_price}','${r.client_id}',
-      'Buy'
-    )
-    `);
-
-    let contract_id = await queryByPromise(`
-    SELECT contract_id FROM client.contract_summary 
-    WHERE client_id='${r.client_id}' AND entry_time='${r.entry_time}'
-    `);
+    const my_query = {
+      text:
+      `CALL updateActiveContract($1,$2,$3,$4,$5,$6,$7,$8,'Buy');`,
+      values:[this.index,r.contract_type,r.option_type,r.ticks,r.stake,r.entry_time,r.entry_price,r.client_id]
+    };
+    await queryByPromise(my_query);
+    
+    //get contract id
+    const my_query2 = {
+      text:
+      `SELECT contract_id FROM client.contract_summary 
+      WHERE client_id=$1 AND entry_time=$2;`,
+      values:[r.client_id,r.entry_time]
+    };
+    let contract_id = await queryByPromise(my_query2);
 
     this.contract_id = contract_id.result[0].contract_id;
     r.contract_id = this.contract_id;
@@ -177,23 +183,14 @@ class Contract {
         r.payout = 0.0;
       }
     }
-
-    await queryByPromise(`
-      CALL updateClosedContract(
-        '${r.payout}',
-        '${r.entry_time}',
-        '${r.exit_time}',
-        '${r.exit_price}',
-        '${r.client_id}',
-        '${r.contract_id}',
-        'Sell'
-        )`);
+    const my_query = {
+      text:`CALL updateClosedContract($1,$2,$3,$4,$5,$6,'Sell');`,
+      values:[r.payout,r.entry_time,r.exit_time,r.exit_price,r.client_id,r.contract_id]
+    };
+    await queryByPromise(my_query);
     return r;
   }
 }
 
 module.exports = Contract;
 
-//all entry time and exit time will still hv 1 sec delay(sometimes...)
-//even frontend send with price we still have to veriify it with db
-//which is impossible as you can't write & read at the same time
