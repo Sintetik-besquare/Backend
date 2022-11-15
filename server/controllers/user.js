@@ -115,7 +115,7 @@ const userController = {
     //send email
     const link = `${env.EMAIL_BASE_URL}/password-reset/${id.result[0].id}/${token}`;
     await sendEmail(email,"Password Reset", link );
-    console.log(email);
+    
     return res.status(200).json({
       status: true,
       message: "Password reset link has sent to your email account",

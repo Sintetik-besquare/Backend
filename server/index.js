@@ -84,7 +84,7 @@ io.on("connection", async (socket) => {
 
   socket.on("order", async (data) => {
     let { index, stake, ticks, option_type, entry_time } = data;
-    console.log(data);
+    //console.log(data);
     //to test
     // let current_time = Math.floor(Date.now() / 1000);
     // const contract = new Contract(
@@ -105,10 +105,9 @@ io.on("connection", async (socket) => {
       entry_time
     );
 
-    // const contract = new contract('vol', 12,321)
     let buy_contract = await contract.buy();
     //during buy event just send bk contract id and status
-    console.log(buy_contract);
+    // console.log(buy_contract);
     socket.emit("buy", buy_contract);
     
     if(buy_contract.status){

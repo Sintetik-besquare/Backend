@@ -36,8 +36,8 @@ class Contract {
     let current_time = current[0][1][3];
     let current_price = current[0][1][1];
 
-    console.log("entry price is ", this.entry_price, "time is", this.entry_time);
-    console.log("current price is ", current_price, "time is", current_time);
+    // console.log("entry price is ", this.entry_price, "time is", this.entry_time);
+    // console.log("current price is ", current_price, "time is", current_time);
 
     if (this.option_type === "call") {
       if (this.entry_price > current_price) {

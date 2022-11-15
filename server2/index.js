@@ -59,8 +59,7 @@ io.on('connection', async (socket)=>{
   //multiple subscribe channel
   await redis.subscribe("price feed");
   await redis.on("message",(channel,message)=>{
-    //console.log(message);
-    //console.log(message, socket.id);
+
     socket.emit("getfeed",message);
     //frontend will socket.on("selected channel")
      

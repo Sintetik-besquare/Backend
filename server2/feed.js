@@ -58,7 +58,7 @@ feed = {
 };
 
 ( async () => {
-//console.log(feed);
+//publish price feed
 await redis.publish("price feed", JSON.stringify(feed));
 
 //store data to redis stream
