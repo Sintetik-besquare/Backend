@@ -11,7 +11,7 @@ const historicalFeed = {
         ( async () => {
             
             const val = await redis.xrevrange('price feed','+','-','COUNT','10');
-            return res.status(200).json({sucess: true, message:val})
+            return res.status(200).json({status: true, message:val})
         })();
         
     },

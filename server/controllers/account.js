@@ -5,7 +5,7 @@ const { validationResult } = require('express-validator');
 
 const accountController = {
   //Topup/Reset Balance
-  resetUserBalance: async (req, res) => {
+    resetUserBalance: async (req, res) => {
     const client_id = req.user;
 
     const errors = validationResult(req);
@@ -94,8 +94,8 @@ const accountController = {
 
     return res.status(200).json({
       status: true,
-      message: "successfully retrived user transaction!",
-      transaction: user_transaction.result,
+      message: "successfully retrived user contract Summary!",
+      contract_summary: user_transaction.result,
     });
   },
 

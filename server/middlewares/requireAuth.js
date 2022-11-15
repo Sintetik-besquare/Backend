@@ -18,9 +18,12 @@ const requireAuth = async (req, res, next) => {
         const {client_id} = jwt.verify(token, process.env.SECRET);
         //check thether the user_id exist 
         //req.user attach user_id into the req.body for the next request function
-        
-        const id = await queryByPromise(
-            `select client_id from client.account where client_id='${client_id}'`); 
+        const my_query = {
+            text:
+            `select client_id from client.account where client_id=$1;`,
+            values:[client_id]
+          }
+        const id = await queryByPromise(my_query); 
         req.user = id.result[0].client_id
       
         //go to next handler function

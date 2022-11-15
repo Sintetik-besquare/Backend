@@ -1,5 +1,3 @@
-
-
 CREATE SCHEMA IF NOT EXISTS feed;
 
 CREATE SCHEMA IF NOT EXISTS client;
@@ -54,6 +52,14 @@ CREATE TABLE IF NOT EXISTS client.transaction(
     balance numeric(10, 2) NOT NULL,
     contract_id bigint REFERENCES client.contract_summary(contract_id),
     client_id bigint REFERENCES client.account(client_id)
+);
+
+CREATE TABLE IF NOT EXISTS client.resetPassword(
+    id bigserial primary key,
+    token varchar(255) NOT NULL,
+    created_at  bigint NOT NULL,  
+    expired_at bigint NOT NULL, 
+    client_id bigint NOT NULL REFERENCES client.account(client_id)
 );
 
 CREATE OR REPLACE PROCEDURE storeFeed(
@@ -141,3 +147,4 @@ BEGIN
     COMMIT;
 END;
 $$;
+

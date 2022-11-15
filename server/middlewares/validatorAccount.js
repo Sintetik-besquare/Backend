@@ -14,8 +14,12 @@ resetPasswordValidation = [
     .isLength({ min: 8 }).withMessage("Invalid Password").bail()
     .custom(async (password,{req})=>{
         //get old hash password and use bcrypt to compare
-        const user_hash_password = await queryByPromise(
-        `SELECT password FROM client.account WHERE client_id='${req.user}'`);
+        const my_query = {
+            text:
+            `SELECT password FROM client.account WHERE client_id=$1;`,
+            values:[req.user]
+          }
+        const user_hash_password = await queryByPromise(my_query);
         //compare the hash password with old password
         const match = await bcrypt.compare(
         password,
