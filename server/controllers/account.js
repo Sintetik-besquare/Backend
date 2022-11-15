@@ -94,7 +94,7 @@ const accountController = {
 
     return res.status(200).json({
       status: true,
-      message: "successfully retrived user contract Summary!",
+      message: "successfully retrived user contract summary!",
       contract_summary: user_transaction.result,
     });
   },
