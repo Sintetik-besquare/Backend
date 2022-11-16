@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS feed.symbol(
 
 CREATE TABLE IF NOT EXISTS feed.symbol_price(
     id bigserial primary key,
-    price numeric(8,2) NOT NULL,
+    price numeric(15,2) NOT NULL,
     ts  bigint NOT NULL,  
     symbol_id bigint NOT NULL REFERENCES feed.symbol(id)
 );
@@ -39,8 +39,8 @@ CREATE TABLE IF NOT EXISTS client.contract_summary(
     payout numeric(10, 2),
     entry_time bigint NOT NULL,
     exit_time bigint,
-    entry_spot numeric(10, 2) NOT NULL,
-    exit_spot numeric(10, 2),
+    entry_spot numeric(15, 2) NOT NULL,
+    exit_spot numeric(15, 2),
     client_id bigint REFERENCES client.account(client_id)
 );
 

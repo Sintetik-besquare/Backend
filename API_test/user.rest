@@ -18,17 +18,16 @@ content-type: application/json
 ### reset userbalance
 POST http://localhost:3001/account/resetBalance HTTP/1.1
 content-type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnRfaWQiOiI1IiwiaWF0IjoxNjY4NDg1NzE5LCJleHAiOjE2Njg1NzIxMTl9.MbusUTWxbUXySHyyGCntFJ9jhGQfEnQ7VOmYJ13iaq0
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnRfaWQiOiI1IiwiaWF0IjoxNjY4NTg3NTI5LCJleHAiOjE2Njg2NzM5Mjl9.h_MTOapAz1M1AxHsK0UWbqh69QppsVYTMpQz74eqUzM
 
 {
-
     "reset_balance" :"true"
 }
 
 ### get userbalance
 GET http://localhost:3001/account/getBalance HTTP/1.1
 content-type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnRfaWQiOiI1IiwiaWF0IjoxNjY4NDg1NzE5LCJleHAiOjE2Njg1NzIxMTl9.MbusUTWxbUXySHyyGCntFJ9jhGQfEnQ7VOmYJ13iaq0
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnRfaWQiOiI1IiwiaWF0IjoxNjY4NTY5NDM4LCJleHAiOjE2Njg2NTU4Mzh9.iPzfLL0ZCxbjrqBObcNNsbNcFxOT8wpMZ3zW68SSBoc
 
 ### get userTransaction
 GET http://localhost:3001/account/getTransaction HTTP/1.1

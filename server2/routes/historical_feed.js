@@ -5,7 +5,7 @@ const router = express.Router();
 const historicalFeedController = require('../controllers/historical_feed');
 
 router
-.get('/historical',historicalFeedController.getFeed)
+.get('/historical/:index',historicalFeedController.getFeed)
 
 
 module.exports= router;   

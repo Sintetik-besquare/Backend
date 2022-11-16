@@ -88,7 +88,7 @@ io.on("connection", async (socket) => {
     //to test
     // let current_time = Math.floor(Date.now() / 1000);
     // const contract = new Contract(
-    //   "Volatility 10 (1s)",
+    //   "Vol100",
     //   client_id,
     //   "call",
     //   15,

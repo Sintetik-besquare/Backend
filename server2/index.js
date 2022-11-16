@@ -50,23 +50,22 @@ const io = require('socket.io')(server,{
 
 //connect to socketio 
 io.on('connection', async (socket)=>{
-  socket.on("socket1",(arg)=>{
-    console.log(arg);
-  })
-  console.log("Client connected!!!!",socket.id);
+  console.log("Client connected!!!!");
 
-  //get selected symbol from frontend
-  //multiple subscribe channel
-  await redis.subscribe("price feed");
-  await redis.on("message",(channel,message)=>{
+//for future more indices
+//  const test =  socket.on("feed",async (data)=>{
+//    const {index} = req.params;
+//   });
 
-    socket.emit("getfeed",message);
-    //frontend will socket.on("selected channel")
-     
-      });
-    socket.on("disconnect",async ()=>{
-      console.log("Client disconnected");
-    })  
+
+    await redis.subscribe("VOL100");
+    await redis.on("message",(channel,message)=>{
+      socket.emit("getfeed",message);
+    });
+
+  socket.on("disconnect",async ()=>{
+    console.log("Client disconnected");
+  });
     
   });
 

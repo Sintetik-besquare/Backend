@@ -47,35 +47,81 @@ let S_feed = [S0];
 
 function send_feed() {
 
-let S, feed, final_S;
-S = brownianMotion(2, 0, 0.1, 0.01);
-// append only the first element of the geometric brownian motion into the S_feed array:
-S_feed.push(S[0].toFixed(2));
-// delete the previous element (first element) in the array:
-S_feed.shift();
-// take the last element of the S_feed array
-final_S = S_feed.slice(-1)[0];
-let current_time = Math.floor(Date.now()/1000) ;
-feed = {
-  "price": final_S,
-  "timestamp": current_time,
-  "symbol_name": "Volatility 10 (1s)"
-};
+
+function final_feed(sigma, symbol_name){
+  let current_time = Math.floor(Date.now()/1000) ;
+  let S, feed, final_S;
+  S = brownianMotion(2, 0, sigma, 0.01);
+  // append only the first element of the geometric brownian motion into the S_feed array:
+  S_feed.push(S[0].toFixed(2));
+  // delete the previous element (first element) in the array:
+  S_feed.shift();
+  // take the last element of the S_feed array
+  final_S = S_feed.slice(-1)[0];
+
+  return {
+    price : final_S,
+    timestamp : current_time,
+    symbol_name : symbol_name,
+  };
+}
+
+feed_vol20= final_feed(0.2,"VOL20");
+feed_vol40= final_feed(0.4,"VOL40");
+feed_vol60= final_feed(0.6,"VOL60");
+feed_vol80= final_feed(0.8,"VOL60");
+feed_vol100= final_feed(1,"VOL100");
 
 ( async () => {
 //publish price feed
-await redis.publish("price feed", JSON.stringify(feed));
-
 //store data to redis stream
-await redis.xadd("price feed","MAXLEN","86400", "*","price",feed.price,"timestamp",feed.timestamp,"symbol_name",feed.symbol_name);
+await redis.publish("VOL20", JSON.stringify(feed_vol20));
+await redis.xadd("VOL20","MAXLEN","3600", "*","price",feed_vol20.price,"timestamp",feed_vol20.timestamp,"symbol_name",feed_vol20.symbol_name);
+
+await redis.publish("VOL40", JSON.stringify(feed_vol40));
+await redis.xadd("VOL40","MAXLEN","3600", "*","price",feed_vol40.price,"timestamp",feed_vol40.timestamp,"symbol_name",feed_vol40.symbol_name);
+
+await redis.publish("VOL60", JSON.stringify(feed_vol60));
+await redis.xadd("VOL60","MAXLEN","3600", "*","price",feed_vol60.price,"timestamp",feed_vol60.timestamp,"symbol_name",feed_vol60.symbol_name);
+
+await redis.publish("VOL80", JSON.stringify(feed_vol80));
+await redis.xadd("VOL80","MAXLEN","3600", "*","price",feed_vol80.price,"timestamp",feed_vol80.timestamp,"symbol_name",feed_vol80.symbol_name);
+
+await redis.publish("VOL100", JSON.stringify(feed_vol100));
+await redis.xadd("VOL100","MAXLEN","3600", "*","price",feed_vol100.price,"timestamp",feed_vol100.timestamp,"symbol_name",feed_vol100.symbol_name);
+
 
 //store data to postgres
-const my_query = {
+const vol20 = {
   text:`CALL storeFeed($1,$2,$3);`,
-  values:[feed.symbol_name,feed.price,feed.timestamp]
+  values:[feed_vol20.symbol_name, feed_vol20.price, feed_vol20.timestamp]
 };
+await queryByPromise(vol20);
 
-await queryByPromise(my_query);
+const vol40 = {
+  text:`CALL storeFeed($1,$2,$3);`,
+  values:[feed_vol40.symbol_name, feed_vol40.price, feed_vol40.timestamp]
+};
+await queryByPromise(vol40);
+
+const vol60 = {
+  text:`CALL storeFeed($1,$2,$3);`,
+  values:[feed_vol60.symbol_name, feed_vol60.price, feed_vol60.timestamp]
+};
+await queryByPromise(vol60);
+
+const vol80 = {
+  text:`CALL storeFeed($1,$2,$3);`,
+  values:[feed_vol80.symbol_name, feed_vol80.price, feed_vol80.timestamp]
+};
+await queryByPromise(vol80);
+
+const vol100 = {
+  text:`CALL storeFeed($1,$2,$3);`,
+  values:[feed_vol100.symbol_name, feed_vol100.price, feed_vol100.timestamp]
+};
+await queryByPromise(vol100);
+
 
 })();
 
