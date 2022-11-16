@@ -7,5 +7,3 @@
     $ docker compose --env-file .env up --build
 5. Command to stop docker compose: 
     $ docker compose down
-
-sudo chmod 666 /var/run/docker.sock
