@@ -3,15 +3,92 @@ POST http://localhost:3001/user/signup HTTP/1.1
 content-type: application/json
 
 {
-    "email": "kath105@gmail.com",
-    "password": "Abcd1234!"
+    "email": "kai.ling8@besquare.com.my",
+    "password": "Abcd123!"
 }
 ### Login
 POST http://localhost:3001/user/login HTTP/1.1
 content-type: application/json
 
 {
-    "email": "kath105@gmail.com",
-    "password": "Abcd1234!"
+    "email": "kai.ling8@besquare.com.my",
+    "password": "AAAbcd1234!!_"
 
 }
+### reset userbalance
+POST http://localhost:3001/account/resetBalance HTTP/1.1
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnRfaWQiOiI1IiwiaWF0IjoxNjY4NDg1NzE5LCJleHAiOjE2Njg1NzIxMTl9.MbusUTWxbUXySHyyGCntFJ9jhGQfEnQ7VOmYJ13iaq0
+
+{
+
+    "reset_balance" :"true"
+}
+
+### get userbalance
+GET http://localhost:3001/account/getBalance HTTP/1.1
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnRfaWQiOiI1IiwiaWF0IjoxNjY4NDg1NzE5LCJleHAiOjE2Njg1NzIxMTl9.MbusUTWxbUXySHyyGCntFJ9jhGQfEnQ7VOmYJ13iaq0
+
+### get userTransaction
+GET http://localhost:3001/account/getTransaction HTTP/1.1
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnRfaWQiOiI1IiwiaWF0IjoxNjY4NDg1NzE5LCJleHAiOjE2Njg1NzIxMTl9.MbusUTWxbUXySHyyGCntFJ9jhGQfEnQ7VOmYJ13iaq0
+
+### get userContractSummary
+GET http://localhost:3001/account/getContractSummary HTTP/1.1
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnRfaWQiOiI1IiwiaWF0IjoxNjY4NDg1NzE5LCJleHAiOjE2Njg1NzIxMTl9.MbusUTWxbUXySHyyGCntFJ9jhGQfEnQ7VOmYJ13iaq0
+
+
+### reset password
+POST http://localhost:3001/account/resetPassword HTTP/1.1
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnRfaWQiOiI1IiwiaWF0IjoxNjY4NDg1NzE5LCJleHAiOjE2Njg1NzIxMTl9.MbusUTWxbUXySHyyGCntFJ9jhGQfEnQ7VOmYJ13iaq0
+
+{
+    "old_password": "Abcd123!",
+    "new_password": "AAAbcd1234!!_",
+    "new_password_confirmation": "AAAbcd1234!!_"
+}
+
+### get user details
+GET http://localhost:3001/account/getUserDetails HTTP/1.1
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnRfaWQiOiI1IiwiaWF0IjoxNjY4NDg1NzE5LCJleHAiOjE2Njg1NzIxMTl9.MbusUTWxbUXySHyyGCntFJ9jhGQfEnQ7VOmYJ13iaq0
+
+### edit user details
+POST http://localhost:3001/account/editUserDetails HTTP/1.1
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnRfaWQiOiI1IiwiaWF0IjoxNjY4NDg1NzE5LCJleHAiOjE2Njg1NzIxMTl9.MbusUTWxbUXySHyyGCntFJ9jhGQfEnQ7VOmYJ13iaq0
+
+{
+    "firstname":"limmm",
+    "lastname":"kath",
+    "gender": "Female",
+    "residence":"Malaysia",
+    "occupation":"Student",
+    "age":"19",
+    "education":"Tertiary"
+
+}
+
+### send reset password link
+POST http://localhost:3001/user/password-reset HTTP/1.1
+content-type: application/json
+
+{
+    "email": "kai.ling@besquare.com.my"
+
+}
+
+### reset password
+POST http://localhost:3001/user/password-reset/2/a9dcec76424ce4412549dad9138b22ddb338769772731958a71e4a5319493218 HTTP/1.1
+content-type: application/json
+
+{
+    "password":"Abcd1234!@",
+    "confirm_password":"Abcd1234!@"
+}
+
+
