@@ -16,7 +16,8 @@ function brownianMotion(T, mu, sigma, dt) {
   X = [];
   N = Math.round(T / dt);
   t = linspace(0, T, N);
-
+  // Draw random samples from a normal (Gaussian) distribution
+  // generate random numbers where max = 1, min = -1 as mean = 0, std = 1:
   for(var i=0; i<N; i++) {
   W[i] = Math.random() * (1 - (-1)) + (-1);;
   }
@@ -24,7 +25,7 @@ function brownianMotion(T, mu, sigma, dt) {
   for(var i=0; i<W.length; i++) {
     W[i] = W[i] * Math.sqrt(dt);
   }
-
+  // standard brownian motion (wiener process)
   for(var i=0; i<t.length; i++) {
 	t[i] = t[i] * (mu - 0.5 * Math.pow(sigma, 2));
   }
@@ -37,6 +38,7 @@ function brownianMotion(T, mu, sigma, dt) {
 	  S[i] = S_feed[S_feed.length - 1] * Math.exp(X[i]);
   }
   return S;
+  // geometric brownian motion
 }
 
 let S0 = 20000;
@@ -47,8 +49,11 @@ function send_feed() {
 
 let S, feed, final_S;
 S = brownianMotion(2, 0, 0.1, 0.01);
+// append only the first element of the geometric brownian motion into the S_feed array:
 S_feed.push(S[0].toFixed(2));
+// delete the previous element (first element) in the array:
 S_feed.shift();
+// take the last element of the S_feed array
 final_S = S_feed.slice(-1)[0];
 let current_time = Math.floor(Date.now()/1000) ;
 feed = {
