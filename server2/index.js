@@ -30,7 +30,6 @@ app.use('*', (req, res) => {
   });
 
 const Redis = require('ioredis');
-const { index } = require('mathjs');
 
 const env = process.env;
 const redis = new Redis({
