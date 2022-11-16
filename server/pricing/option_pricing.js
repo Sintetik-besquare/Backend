@@ -1,7 +1,6 @@
 // calculate option pricing in Javascript
 
 const mathjs = require("mathjs");
-var comm, contract_unit_price, n_contract, payout, stake;
 
 // function for standard normal cumulative distribution
 function cdfNormal(x, mean, standardDeviation) {
@@ -22,7 +21,7 @@ function bs_binary_option(St, K, sigma, delta_t, r, d, option_type) {
     (Math.log(St / K) + (r - d + Math.pow(sigma, 2) / 2) * delta_t);
   d2 = d1 - sigma * Math.sqrt(delta_t);
 
-  // d1 is the rate of change of call option price with respect to change in underlying asset spot price
+// d1 is the rate of change of call option price with respect to change in underlying asset spot price
 // d2 is the probability that call option expires in the money
 // (for the case of rise/fall binary option contract, d2 for both call and put options will tend to hover around 50%)
 

@@ -9,8 +9,8 @@ const redis = new Redis({
 const historicalFeed = {
     getFeed: async (req,res)=>{
         ( async () => {
-            
-            const val = await redis.xrevrange('price feed','+','-','COUNT','10');
+            const {index} = req.params;
+            const val = await redis.xrevrange(index.toUpperCase(),'+','-','COUNT','10');
             return res.status(200).json({status: true, message:val})
         })();
         

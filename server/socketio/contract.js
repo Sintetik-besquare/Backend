@@ -1,6 +1,3 @@
-//write a script keep tracking client's contract that's opining
-//send the contract's details to frontend through pub/sub
-//once the contract ended/closed store it into database
 const { queryByPromise } = require("../dbconfig/db");
 const contract_unit_price = require("../pricing/option_pricing");
 
@@ -26,32 +23,52 @@ class Contract {
     this.isBalance = false;
     this.isEntryTime = false;
     this.comm = 0.012;
-    if (this.index === "Volatility 10 (1s)") {
+    if (this.index === "VOL20") {
+      this.sigma = 0.2;
+    }
+    else if(this.index === "VOL40"){
+      this.sigma = 0.4;
+    }
+    else if(this.index === "VOL60"){
+      this.sigma = 0.6;
+    }
+    else if(this.index === "VOL80"){
+      this.sigma = 0.8;
+    }
+    else if(this.index === "VOL100"){
       this.sigma = 1;
     }
+    
   }
 
   async checkStatus() {
-    let current = await redis.xrevrange("price feed", "+", "-", "COUNT", "1");
-    let current_time = current[0][1][3];
+    //get current price 
+    let current = await redis.xrevrange(this.index, "+", "-", "COUNT", "1");
+    //let current_time = current[0][1][3];
     let current_price = current[0][1][1];
 
     // console.log("entry price is ", this.entry_price, "time is", this.entry_time);
     // console.log("current price is ", current_price, "time is", current_time);
-
+    let r = {
+      contract_id: this.contract_id
+    };
     if (this.option_type === "call") {
       if (this.entry_price > current_price) {
-        return { status: "Lost" };
+        r.status = "Lost";
+        return r;
       }
-      return { status: "Win" };
-    } else if (this.option_type === "put") {
+      r.status = "Win";
+      return r;
+    } 
+    else if (this.option_type === "put") {
       if (this.entry_price > current_price) {
-        return { status: "Win" };
+        r.status = "Win";
+        return r;
       }
-      return { status: "Lost" };
+      r.status="Lost";
+      return r;
     }
 
-    return "Invalid action";
   }
 
   async checkEntryTime() {
@@ -78,7 +95,8 @@ class Contract {
   }
 
   async calculatePayout() {
-    let payout =
+    if(this.contract_type==="Rise/fall"){
+      let payout =
       this.stake /
       (contract_unit_price.bs_binary_option(
         this.entry_price,
@@ -91,25 +109,36 @@ class Contract {
       ) +
         this.comm);
     return payout.toFixed(2);
+    }
+    //Add on if more contract type 
+    
   }
 
   async buy() {
     await this.checkEntryTime();
     await this.checkBalance();
-
+    //check intry time
     if (!this.isEntryTime) {
       return { status: false, errorMessage: "Invalid entry time" };
     }
+    //check index 
+    let indices = ["VOL20","VOL40","VOL60","VOL80","VOL100"];
+
+    let found = indices.some(index=> index===this.index);
+    if(!found){
+      return { status: false, errorMessage: "Invalid index" };
+    }
+    //check option type
     if (this.option_type !== "put" && this.option_type !== "call") {
       return { status: false, errorMessage: "Invalid option type" };
     }
+    //check client balance
     if (!this.isBalance) {
       return { status: false, errorMessage: "Insufficient balance" };
     }
-
-    //get entry price from entry time
+    //get entry price
     if (!this.entry_price) {
-      let price = await redis.xrevrange("price feed", "+", "-", "COUNT", "1");
+      let price = await redis.xrevrange(this.index, "+", "-", "COUNT", "1");
       let entry_price = price[0][1][1];
       this.entry_price = entry_price;
     }
@@ -150,7 +179,8 @@ class Contract {
   }
 
   async sell() {
-    let price = await redis.xrevrange("price feed", "+", "-", "COUNT", "1");
+    //get exit price
+    let price = await redis.xrevrange(this.index, "+", "-", "COUNT", "1");
     let exit_price = price;
     this.exit_price = exit_price[0][1][1];
     let final_payout = await this.calculatePayout();
