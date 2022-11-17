@@ -118,7 +118,7 @@ class Contract {
   async buy() {
     await this.checkEntryTime();
     await this.checkBalance();
-    //check intry time
+    //check entry time
     if (!this.isEntryTime) {
       return { status: false, errorMessage: "Invalid entry time" };
     }
