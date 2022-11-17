@@ -1,5 +1,9 @@
 const jwt = require('jsonwebtoken')
 const { queryByPromise } = require('../dbconfig/db');
+const fs = require('fs');
+const path =require('path');
+const publicKey = fs.readFileSync(path.join(__dirname,"../jwt_certs/public.pem"), "utf8" );
+const {decrypt} = require('../utils/crypto');
 
 const requireAuth = async (req, res, next) => {
 
@@ -15,7 +19,9 @@ const requireAuth = async (req, res, next) => {
 
     try{
         //get user_id from payload 
-        const {client_id} = jwt.verify(token, process.env.SECRET);
+        let {client_id} = jwt.verify(token, publicKey, { expiresIn: "1d", algorithm:'RS256' });
+        client_id = decrypt(client_id);
+        
         //check thether the user_id exist 
         //req.user attach user_id into the req.body for the next request function
         const my_query = {
@@ -30,6 +36,7 @@ const requireAuth = async (req, res, next) => {
         next(); 
 
     }catch(error){
+        console.log(error);
         return res.status(401).json({ errorMessage: "Request is not authorized" });
     };
     

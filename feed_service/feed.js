@@ -6,7 +6,8 @@ const env =process.env;
 const { queryByPromise } = require('./dbconfig/db');
 const redis = new Redis({
   host:'redis',
-  port:env.REDIS_PORT
+  port:env.REDIS_PORT,
+  password:env.REDIS_PASSWORD
 });
 
 function brownianMotion(T, mu, sigma, dt) {

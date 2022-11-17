@@ -6,13 +6,18 @@ const { validationResult } = require('express-validator');
 const sendEmail = require('../utils/send_email');
 const crypto = require("crypto");
 const env = process.env;
+const fs = require('fs');
+const path =require('path');
+const { encrypt } = require('../utils/crypto');
+const privateKey = fs.readFileSync(path.join(__dirname,"../jwt_certs/private.pem"), "utf8" );
 
 const createToken = (client_id) => {
-  return jwt.sign({ client_id }, process.env.SECRET, { expiresIn: "1d" });
+  client_id =encrypt(client_id);
+  return jwt.sign({ client_id }, privateKey, { expiresIn: "1d", algorithm:'RS256' });
 };
 
 const userController = {
-  //login user
+  //login user 
   loginUser: async (req, res) => {
     const { email, password } = req.body;
 

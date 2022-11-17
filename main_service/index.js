@@ -4,6 +4,10 @@ const http = require("http");
 const morgan = require("morgan");
 const cors = require("cors");
 const { queryByPromise } = require("./dbconfig/db");
+const fs = require('fs');
+const path =require('path');
+const publicKey = fs.readFileSync(path.join(__dirname,"./jwt_certs/public.pem"), "utf8" );
+const {decrypt} = require('./utils/crypto');
 
 //list of all available routes
 const userRouter = require("./routes/user");
@@ -49,14 +53,16 @@ const io = require("socket.io")(server, {
 const jwt = require("jsonwebtoken");
 
 io.use(async (socket, next) => {
+
   const token = socket.handshake.query.token;
   if (!token) {
     next(new Error("Request is not authorized"));
   }
   try {
     //get client_id from payload
-    const { client_id } = jwt.verify(token, process.env.SECRET);
-    
+    let {client_id} = jwt.verify(token, publicKey, { expiresIn: "1d", algorithm:'RS256' });
+    client_id = decrypt(client_id);
+ 
     //check whether the client_id exist in db
     const my_query = {
       text:

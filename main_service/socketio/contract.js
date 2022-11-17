@@ -8,6 +8,7 @@ const env = process.env;
 const redis = new Redis({
   host: "redis",
   port: env.REDIS_PORT,
+  password:env.REDIS_PASSWORD
 });
 
 class Contract {
@@ -117,7 +118,7 @@ class Contract {
   async buy() {
     await this.checkEntryTime();
     await this.checkBalance();
-    //check entry time
+    //check intry time
     if (!this.isEntryTime) {
       return { status: false, errorMessage: "Invalid entry time" };
     }

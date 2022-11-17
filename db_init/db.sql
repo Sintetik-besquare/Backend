@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS feed.symbol(
 
 CREATE TABLE IF NOT EXISTS feed.symbol_price(
     id bigserial primary key,
-    price numeric(15,2) NOT NULL,
+    price numeric(22,2) NOT NULL,
     ts  bigint NOT NULL,  
     symbol_id bigint NOT NULL REFERENCES feed.symbol(id)
 );
@@ -39,8 +39,8 @@ CREATE TABLE IF NOT EXISTS client.contract_summary(
     payout numeric(10, 2),
     entry_time bigint NOT NULL,
     exit_time bigint,
-    entry_spot numeric(15, 2) NOT NULL,
-    exit_spot numeric(15, 2),
+    entry_spot numeric(22, 2) NOT NULL,
+    exit_spot numeric(22, 2),
     client_id bigint REFERENCES client.account(client_id)
 );
 
@@ -118,7 +118,7 @@ BEGIN
         RETURNING contract_id
     )
     INSERT INTO client.transaction (transaction_time,transaction_type,transaction_amount,balance,contract_id,client_id)
-    VALUES("entrytime","transactiontype","premium",(SELECT balance FROM client.account WHERE client_id = "clientid"),
+    VALUES("entrytime","transactiontype",-"premium",(SELECT balance FROM client.account WHERE client_id = "clientid"),
     (SELECT contract_id FROM ins),"clientid");
     COMMIT;
 END;
