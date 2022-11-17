@@ -129,7 +129,7 @@ const accountController = {
     const client_id = req.user;
     const my_query = {
       text:
-      `SELECT first_name, last_name, gender, residence, 
+      `SELECT email, client_id, first_name, last_name, gender, residence, 
       occupation, age, education, date_join
       FROM client.account WHERE client_id = $1;`,
       values:[client_id]
