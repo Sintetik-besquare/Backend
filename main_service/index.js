@@ -4,11 +4,14 @@ const http = require("http");
 const morgan = require("morgan");
 const cors = require("cors");
 const { queryByPromise } = require("./dbconfig/db");
-const fs = require('fs');
-const path =require('path');
-const publicKey = fs.readFileSync(path.join(__dirname,"./jwt_certs/public.pem"), "utf8" );
-const {decrypt} = require('./utils/crypto');
-
+const fs = require("fs");
+const path = require("path");
+const publicKey = fs.readFileSync(
+  path.join(__dirname, "./jwt_certs/public.pem"),
+  "utf8"
+);
+const { decrypt } = require("./utils/crypto");
+const errorHandler = require("./middlewares/errorHandler");
 //list of all available routes
 const userRouter = require("./routes/user");
 const accountRouter = require("./routes/account");
@@ -31,13 +34,17 @@ app.use(express.urlencoded({ extended: true }));
 //API endpoints
 app.use("/user", userRouter);
 app.use("/account", accountRouter);
+
 //Error for invalid API endpoint
 app.use("*", (req, res) => {
-  return res.status(404).json({
-    success: false,
+  res.status(404).json({
     message: "API endpoint doesnt exist",
   });
 });
+
+//error handling 
+app.use(errorHandler);
+
 //create backend server
 const server = http.createServer(app);
 
@@ -49,96 +56,86 @@ const io = require("socket.io")(server, {
   },
 });
 
-//Todo: add authentication to socketio
+//Authentication for socket connection
 const jwt = require("jsonwebtoken");
 
 io.use(async (socket, next) => {
-
   const token = socket.handshake.query.token;
   if (!token) {
-    next(new Error("Request is not authorized"));
+    const error = new Error("JWT must be provided");
+    next(error);
   }
   try {
     //get client_id from payload
-    let {client_id} = jwt.verify(token, publicKey, { expiresIn: "1d", algorithm:'RS256' });
+    let { client_id } = jwt.verify(token, publicKey, {
+      expiresIn: "1d",
+      algorithm: "RS256",
+    });
     client_id = decrypt(client_id);
- 
+
     //check whether the client_id exist in db
     const my_query = {
-      text:
-      `select client_id from client.account where client_id=$1;`,
-      values:[client_id]
-    }
+      text: `select client_id from client.account where client_id=$1;`,
+      values: [client_id],
+    };
     const id = await queryByPromise(my_query);
 
     //pass client_id to sokect on connection
     socket.data = id.result[0].client_id;
     next();
+
   } catch (error) {
-    console.log(error);
-    next(new Error("Request is not authorized"));
+    next(error);
   }
 });
 const Contract = require("./socketio/contract");
 
 //connect to socketio
-//dunno why sometimes last entry of redis stream is empty
 io.on("connection", async (socket) => {
   console.log("Client connected!!!!");
+
   //get client id from payload
   const client_id = socket.data;
 
   socket.on("order", async (data) => {
-    let { index, stake, ticks, option_type, entry_time } = data;
-    //console.log(data);
-    //to test
-    // let current_time = Math.floor(Date.now() / 1000);
-    // const contract = new Contract(
-    //   "Vol100",
-    //   client_id,
-    //   "call",
-    //   15,
-    //   5,
-    //   current_time
-    // );
-    // actual code
+    try{
+      let { index, stake, ticks, option_type, entry_time } = data;
+
       const contract = new Contract(
-      index,
-      client_id,
-      option_type,
-      stake,
-      ticks,
-      entry_time
-    );
+        index,
+        client_id,
+        option_type,
+        stake,
+        ticks,
+        entry_time
+      );
 
-    let buy_contract = await contract.buy();
-    //during buy event just send bk contract id and status
-    // console.log(buy_contract);
-    socket.emit("buy", buy_contract);
-    
-    if(buy_contract.status){
-    //depend on ticks keep update isWinning status and profit/lost
-    let timesRun = 0;
-    let interval = setInterval(async function () {
-      timesRun += 1;
-      
-      //update whether contract is Wining
-      let status = await contract.checkStatus();
-      socket.emit("iswinning", status);
+      //buy contract
+      let buy_contract = await contract.buy();
+      //during buy event just send bk contract id and status
+      socket.emit("buy", buy_contract);
 
-      //sell contract after contract expire
-      if (timesRun === ticks) {
-        let sell_contract = await contract.sell();
-        socket.emit("sell",sell_contract);
-        clearInterval(interval);
+      if (buy_contract.status) {
+        //depend on ticks keep update isWinning status and profit/lost
+        let timesRun = 0;
+        let interval = setInterval(async function () {
+          timesRun += 1;
 
-        
+          //update whether contract is Wining
+          let status = await contract.checkStatus();
+          socket.emit("iswinning", status);
+
+          //sell contract after contract expired
+          if (timesRun === ticks) {
+            let sell_contract = await contract.sell();
+            socket.emit("sell", sell_contract);
+            clearInterval(interval);
+          }
+        }, 1000);
       }
-    }, 1000);
-
-
-    }
-   
+    }catch(error){
+      console.log(error);
+    };
   });
 
   socket.on("disconnect", () => {
