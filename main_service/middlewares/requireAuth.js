@@ -40,7 +40,6 @@ const requireAuth = async (req, res, next) => {
     });
     client_id = decrypt(client_id);
 
-    //check thether the user_id exist
     //req.user attach user_id into the req.body for the next request function
     const my_query = {
       text: `select client_id from client.account where client_id=$1;`,
