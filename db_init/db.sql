@@ -7,12 +7,16 @@ CREATE TABLE IF NOT EXISTS feed.symbol(
     symbol_name varchar(50) NOT NULL UNIQUE
 );
 
+CREATE INDEX CONCURRENTLY feed_symbol_name ON feed.symbol (symbol_name);
+
 CREATE TABLE IF NOT EXISTS feed.symbol_price(
     id bigserial primary key,
     price numeric(22,2) NOT NULL,
     ts  bigint NOT NULL,  
     symbol_id bigint NOT NULL REFERENCES feed.symbol(id)
 );
+
+CREATE INDEX CONCURRENTLY feed_symbol_price ON feed.symbol_price (symbol_id,ts);
 
 CREATE TABLE IF NOT EXISTS client.account(
     client_id bigserial primary key,
@@ -29,6 +33,8 @@ CREATE TABLE IF NOT EXISTS client.account(
     balance numeric(10, 2)
 );
 
+CREATE INDEX CONCURRENTLY client_account ON client.account (client_id, email);
+
 CREATE TABLE IF NOT EXISTS client.contract_summary(
     contract_id bigserial primary key,
     symbol varchar(100) NOT NULL,
@@ -44,6 +50,8 @@ CREATE TABLE IF NOT EXISTS client.contract_summary(
     client_id bigint REFERENCES client.account(client_id)
 );
 
+CREATE INDEX CONCURRENTLY client_contract ON client.contract_summary (client_id);
+
 CREATE TABLE IF NOT EXISTS client.transaction(
     transaction_id bigserial primary key,
     transaction_time bigint NOT NULL,
@@ -54,6 +62,8 @@ CREATE TABLE IF NOT EXISTS client.transaction(
     client_id bigint REFERENCES client.account(client_id)
 );
 
+CREATE INDEX CONCURRENTLY client_transaction ON client.transaction (client_id);
+
 CREATE TABLE IF NOT EXISTS client.resetPassword(
     id bigserial primary key,
     token varchar(255) NOT NULL,
@@ -61,6 +71,8 @@ CREATE TABLE IF NOT EXISTS client.resetPassword(
     expired_at bigint NOT NULL, 
     client_id bigint NOT NULL REFERENCES client.account(client_id)
 );
+
+CREATE INDEX CONCURRENTLY client_resetPassword ON client.resetPassword (client_id,token);
 
 CREATE OR REPLACE PROCEDURE storeFeed(
   "name" VARCHAR,
