@@ -6,12 +6,17 @@ const cors = require("cors");
 const { queryByPromise } = require("./dbconfig/db");
 const fs = require("fs");
 const path = require("path");
-const publicKey = fs.readFileSync(
-  path.join(__dirname, "./jwt_certs/public.pem"),
-  "utf8"
-);
+const publicKey = fs.readFileSync(path.join(__dirname, "./jwt_certs/public.pem"), "utf8");
 const { decrypt } = require("./utils/crypto");
+const Redis = require("ioredis");
+const env = process.env;
+const redis = new Redis({
+  host: "redis",
+  port: env.REDIS_PORT,
+  password: env.REDIS_PASSWORD,
+});
 const errorHandler = require("./middlewares/errorHandler");
+
 //list of all available routes
 const userRouter = require("./routes/user");
 const accountRouter = require("./routes/account");
@@ -66,13 +71,20 @@ io.use(async (socket, next) => {
     next(error);
   }
   try {
+     //check whether the token is in blacklist
+     const inBlackList = await redis.get(`bl_${token}`);
+     if (inBlackList) {
+      const error = new Error("Invalid JWT token");
+      next(error);
+     };
+ 
     //get client_id from payload
     let { client_id } = jwt.verify(token, publicKey, {
       expiresIn: "1d",
       algorithm: "RS256",
     });
     client_id = decrypt(client_id);
-
+    
     //check whether the client_id exist in db
     const my_query = {
       text: `select client_id from client.account where client_id=$1;`,
