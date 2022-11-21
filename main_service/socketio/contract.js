@@ -31,7 +31,7 @@ class Contract {
     } else if (this.index === "VOL60") {
       this.sigma = 0.6;
     } else if (this.index === "VOL80") {
-      this.sigma = 0.8;host
+      this.sigma = 0.8;
     } else if (this.index === "VOL100") {
       this.sigma = 1;
     }
@@ -80,28 +80,26 @@ class Contract {
   }
 
   async calculatePayout() {
-    if (this.contract_type === "Rise/fall") {
-      let payout =
-        this.stake /
-        (contract_unit_price.bs_binary_option(
-          this.entry_price,
-          this.entry_price,
-          this.sigma,
-          this.ticks / (60 * 60 * 24 * 365),
-          0,
-          0,
-          this.option_type
-        ) +
-          this.comm);
-      return payout.toFixed(2);
-    }
-    //Add on if more contract type
+    let payout =
+      this.stake /
+      (contract_unit_price.bs_binary_option(
+        this.entry_price,
+        this.entry_price,
+        this.sigma,
+        this.ticks / (60 * 60 * 24 * 365),
+        0,
+        0,
+        this.option_type,
+        this.contract_type
+      ) +
+        this.comm);
+    return (Math.round(payout * 100) / 100).toFixed(2);
   }
 
   async buy() {
     //check entry time
     let current_time = Math.floor(Date.now() / 1000);
-    if (this.entry_time >= current_time || this.entry_time < current_time-1) {
+    if (this.entry_time >= current_time || this.entry_time < current_time - 1) {
       return { status: false, errors: "Invalid entry time" };
     }
     //check index
@@ -116,7 +114,7 @@ class Contract {
       return { status: false, errors: "Invalid option type" };
     }
     //check contract type
-    let contract_type = ["Rise/fall"];
+    let contract_type = ["Rise/fall", "Even/odd"];
     let found2 = contract_type.some((type) => type === this.contract_type);
     if (!found2) {
       return { status: false, errors: "Invalid contract type" };
@@ -131,7 +129,12 @@ class Contract {
       };
     }
     //check stake
-    if (isNaN(this.stake) || !this.stake || /\s/.test(this.stake) || this.stake <0.01) {
+    if (
+      isNaN(this.stake) ||
+      !this.stake ||
+      /\s/.test(this.stake) ||
+      this.stake < 0.01
+    ) {
       return {
         status: false,
         errors: "stake must be a number",

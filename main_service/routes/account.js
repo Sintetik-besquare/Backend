@@ -5,12 +5,13 @@ const requireAuth = require('../middlewares/requireAuth');
 const userController = require('../controllers/account');
 const {resetBalanceValidation,resetPasswordValidation,userDetailsValidation} = require('../middlewares/validatorAccount.js');
 router
-.post('/resetBalance',requireAuth,resetBalanceValidation,userController.resetUserBalance)
+.patch('/resetBalance',requireAuth,resetBalanceValidation,userController.resetUserBalance)
 .get('/getBalance',requireAuth,userController.getUserBalance)
 .get('/getTransaction',requireAuth,userController.getUserTransaction)
 .get('/getContractSummary',requireAuth,userController.getUserContractSummary)
-.post('/resetPassword',requireAuth,resetPasswordValidation,userController.resetPassword)
+.patch('/resetPassword',requireAuth,resetPasswordValidation,userController.resetPassword)
 .get('/getUserDetails',requireAuth, userController.getUserDetails)
-.post('/editUserDetails',requireAuth,userDetailsValidation,userController.editUserDetails)
+.patch('/editUserDetails',requireAuth,userDetailsValidation,userController.editUserDetails)
+.post('/logout',requireAuth,userController.userLogout)
 
 module.exports= router;    
