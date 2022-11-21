@@ -11,11 +11,16 @@
     $ docker compose down
 
 ## Remark
-1. Inside .env file add
-    - REDIS_PORT=6379
-    - REDIS_PASSWORD= "your own password"
+1. Inside .env file include
+    - POSTGRES_USER
+    - POSTGRES_PASSWORD
+    - SECRET > must be 32bits
+    - PGADMIN_DEFAULT_EMAIL
+    - PGADMIN_DEFAULT_PASSWORD
+    - REDIS_PORT
+    - REDIS_PASSWORD
     - EMAIL_HOST="smtp.gmail.com"
-    - EMAIL_USER="your own email"
-    - EMAIL_PASSWORD="password that you get from google"
-    - EMAIL_SENDER="your own email"
-    - EMAIL_BASE_URL=http://localhost:3001/user
+    - EMAIL_USER > your own email
+    - EMAIL_PASSWORD > follow this link to obtain email password https://medium.com/@TusharKanjariya/send-email-using-node-mailer-in-node-js-b813734e9a3e
+    - EMAIL_SENDER > your own email
+    - EMAIL_BASE_URL > http://localhost:3001/user
