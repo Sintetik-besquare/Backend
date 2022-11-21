@@ -14,7 +14,7 @@ function cdfNormal(x, mean, standardDeviation) {
 // sigma is the annualised volatility
 // r and d are the annual risk-free rate and dividend yield respectively
 // (annual risk-free rate is the rate of return offered by an investment that carries zero risk. Since this is not a risk-free trade, the risk-free rate is 0)
-function bs_binary_option(St, K, sigma, delta_t, r, d, option_type) {
+function bs_binary_option(St, K, sigma, delta_t, r, d, option_type, contract_type) {
   var d1, d2;
   d1 =
     (1 / (sigma * Math.sqrt(delta_t))) *
@@ -27,15 +27,19 @@ function bs_binary_option(St, K, sigma, delta_t, r, d, option_type) {
 
 // calculate the binary option pricing for call and put options
 
+if(contract_type = "Rise/fall"){
   if (option_type === "call") {
     return cdfNormal(d2, 0, 1) * Math.exp(-r * delta_t);
-  } else {
-    if (option_type === "put") {
-      return cdfNormal(-d2, 0, 1) * Math.exp(-r * delta_t);
-    } else {
-      console.log("Supported option type: 'call', 'put'");
-    }
-  }
+  } else if (option_type === "put"){
+    return cdfNormal(-d2, 0, 1) * Math.exp(-r * delta_t);
+  };
+}
+else if (contract_type = "Even/odd")
+{
+  //call and put have the same payout
+  return 0.5 * Math.exp(-r * delta_t);
+};
+
 }
 
 // stake = 15;

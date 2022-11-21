@@ -1,6 +1,14 @@
 const { queryByPromise } = require("../dbconfig/db");
 const bcrypt = require("bcrypt");
 const { validationResult } = require("express-validator");
+const Redis = require('ioredis');
+const env =process.env;
+const redis = new Redis({
+  host:'redis',
+  port:env.REDIS_PORT,
+  password:env.REDIS_PASSWORD
+});
+
 
 const accountController = {
   //Topup/Reset Balance
@@ -213,6 +221,31 @@ const accountController = {
       next(error);
     }
   },
+  userLogout: async (req, res, next) => {
+    try{
+      //get token
+      const{authorization} = req.headers;
+      const token = authorization.split(" ")[1];
+      //get user id
+      const client_id = req.user;
+      //get token expiration time
+      const expiration_time = req.exp;
+      
+      //add token to redis (blacklist)
+      const token_key = `bl_${token}`;
+      await redis.set(token_key, token);
+      redis.expire(token_key, expiration_time);
+
+      return res.status(200).json({
+        message: "Token invalidated",
+      });
+
+    }catch(error){
+      console.log(error);
+      next(error);
+    }
+   
+  }
 };
 
 module.exports = accountController;
