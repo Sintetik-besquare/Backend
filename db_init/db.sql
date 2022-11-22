@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS client.account(
     balance numeric(10, 2)
 );
 
-CREATE INDEX CONCURRENTLY client_account ON client.account (client_id, email);
+CREATE INDEX CONCURRENTLY client_account ON client.account (email);
 
 CREATE TABLE IF NOT EXISTS client.contract_summary(
     contract_id bigserial primary key,
