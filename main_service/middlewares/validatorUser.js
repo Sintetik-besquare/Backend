@@ -27,7 +27,17 @@ const bcrypt = require("bcrypt");
       minSymbols: 1
   })
   .withMessage("Password must be greater than 8 and contain at least 1 uppercase letter, 1 lowercase letter, 1 number and 1 symbol").bail()
-  .custom(password => !/\s/.test(password)).withMessage('No spaces are allowed in the password')
+  .custom(password => !/\s/.test(password)).withMessage('No spaces are allowed in the password'),
+
+  body("confirm_password")
+  .not().isEmpty().withMessage("Password cannot be empty").bail()
+  .custom((password,{req})=>{
+      if(password!==req.body.password){
+          throw new Error('Password confirmation does not match');
+      }
+      return true;
+  })
+
   ];
 
   loginValidation= [
