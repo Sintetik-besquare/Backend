@@ -20,6 +20,7 @@
     "morgan": "^1.10.0",
     "nodemon": "^2.0.20",
     "pg": "^8.8.0",
+    "random-normal": "^1.0.0",
     "redis": "^4.4.0",
     "run-all": "^1.0.1",
     "socket.io": "^4.5.3"
