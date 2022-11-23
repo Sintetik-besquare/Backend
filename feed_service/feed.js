@@ -1,9 +1,10 @@
 require('dotenv').config();
 const linspace = require('linspace');
-const math = require('mathjs');
 const Redis = require('ioredis');
 const env =process.env;
 const { queryByPromise } = require('./dbconfig/db');
+const randomNormal = require('random-normal');
+
 const redis = new Redis({
   host:'redis',
   port:env.REDIS_PORT,
@@ -20,23 +21,9 @@ function brownianMotion(T, mu, sigma, dt) {
   // Draw random samples from a normal (Gaussian) distribution
   // generate random numbers where max = 1, min = -1 as mean = 0, std = 1:
   for(var i=0; i<N; i++) {
-  W[i] = Math.random() * (1 - (-1)) + (-1);;
-  }
-  W = math.cumsum(W);
-  for(var i=0; i<W.length; i++) {
-    W[i] = W[i] * Math.sqrt(dt);
-  }
-  // standard brownian motion (wiener process)
-  for(var i=0; i<t.length; i++) {
-	t[i] = t[i] * (mu - 0.5 * Math.pow(sigma, 2));
-  }
-
-  for(var i=0; i<W.length; i++) {
-    X[i] = t[i] + (sigma * W[i]);
-  }
-
-  for(var i=0; i<X.length; i++) {
-	  S[i] = S_feed[S_feed.length - 1] * Math.exp(X[i]);
+  W[i] = randomNormal({dev:sigma}) * Math.sqrt(dt);
+	X[i] = (dt * (mu - 0.5 * Math.pow(sigma, 2))) + (sigma * W[i]);
+	S[i] = S_feed[S_feed.length - 1] * Math.exp(X[i]);
   }
   return S;
   // geometric brownian motion
@@ -51,14 +38,15 @@ function send_feed() {
 
 function final_feed(sigma, symbol_name){
   let current_time = Math.floor(Date.now()/1000) ;
-  let S, feed, final_S;
+  let S, final_S;
   S = brownianMotion(2, 0, sigma, 0.01);
   // append only the first element of the geometric brownian motion into the S_feed array:
-  S_feed.push(S[0].toFixed(2));
+  // S_feed.push(S[0].toFixed(2));
   // delete the previous element (first element) in the array:
-  S_feed.shift();
+  // S_feed.pop();
   // take the last element of the S_feed array
-  final_S = S_feed.slice(-1)[0];
+  final_S =  (Math.round(S[0] * 100) / 100).toFixed(2);
+ 
 
   return {
     price : final_S,
