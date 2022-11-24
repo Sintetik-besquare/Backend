@@ -29,11 +29,6 @@ jobs:
         with:
           node-version: 16.x
 
-      - name: CI Setup in the server folder
-        run: |
-          cd server
-          npm install
-
       - name: Create .env file
         run: |
           touch .env
