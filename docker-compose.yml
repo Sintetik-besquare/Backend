@@ -2,7 +2,7 @@ version: "3.2"
 services:
   backend_services:
     build:
-      context: ./server
+      context: ./main_service
     depends_on:
       - postgres
       - redis
@@ -14,6 +14,12 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=sintetik
       - SECRET=${SECRET}
+      - EMAIL_HOST=${EMAIL_HOST}
+      - EMAIL_USER=${EMAIL_USER}
+      - EMAIL_PASSWORD=${EMAIL_PASSWORD}
+      - EMAIL_SENDER=${EMAIL_SENDER}
+      - EMAIL_BASE_URL=${EMAIL_BASE_URL}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
     ports:
       - "3001:3001"
     container_name: mainservice
@@ -21,7 +27,7 @@ services:
 
   feed_service:
     build:
-      context: ./server2
+      context: ./feed_service
     depends_on:
       - postgres
       - redis
@@ -32,6 +38,7 @@ services:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=sintetik
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
     ports:
       - "3002:3002"
     container_name: feedservice
@@ -42,11 +49,11 @@ services:
     image: "redis:7.0.0"
     networks:
       - network
-    environment:
-      - ALLOW_EMPTY_PASSWORD=yes
+    command: redis-server --requirepass ${REDIS_PASSWORD}
     volumes:
-      - ../redis_mount:/bitnami/redis/data
+      - ../redis_mount:/data
     container_name: redis
+    tty: true
 
   postgres:
     restart: always
@@ -62,6 +69,20 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=sintetik
     container_name: projectdb
+  
+  # pgadmin:
+  #   restart: always
+  #   image: dpage/pgadmin4
+  #   networks:
+  #     - network
+  #   ports:
+  #     - "5050:80"
+  #   volumes:
+  #     - ../pg_mount:/var/lib/pgadmin
+  #   environment:
+  #     - PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL}
+  #     - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD}     
+  #   container_name: pgadmin4
 
 networks:
   network:

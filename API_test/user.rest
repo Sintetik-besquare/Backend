@@ -1,17 +1,96 @@
-## Signup
+### Signup
 POST http://localhost:3001/user/signup HTTP/1.1
 content-type: application/json
 
 {
-    "email": "kath105@gmail.com",
-    "password": "Abcd1234!"
+    "email": "kai.ling25@besquare.com.my",
+    "password": "Abcd1234!@",
+    "confirm_password": "Abcd1234!@"
 }
 ### Login
 POST http://localhost:3001/user/login HTTP/1.1
 content-type: application/json
 
 {
-    "email": "kath105@gmail.com",
-    "password": "Abcd1234!"
+    "email": "kai.ling2@besquare.com.my",
+    "password": "Abcd1234!@"
 
 }
+### reset userbalance
+PATCH http://localhost:3001/account/resetBalance HTTP/1.1
+content-type: application/json
+Authorization: Bearer 
+
+{
+    "reset_balance" :"true"
+}
+
+### get userbalance
+GET http://localhost:3001/account/getBalance HTTP/1.1
+content-type: application/json
+Authorization: Bearer 
+
+### get userTransaction
+GET http://localhost:3001/account/getTransaction HTTP/1.1
+content-type: application/json
+Authorization: Bearer 
+
+### get userContractSummary
+GET http://localhost:3001/account/getContractSummary HTTP/1.1
+content-type: application/json
+Authorization: Bearer 
+
+### reset password
+PATCH http://localhost:3001/account/resetPassword HTTP/1.1
+content-type: application/json
+Authorization: Bearer 
+
+{
+    "old_password": "Abcd1234!@",
+    "new_password": "AAAbc1234!!_",
+    "new_password_confirmation": "AAAbc1234!!_"
+}
+
+### get user details
+GET http://localhost:3001/account/getUserDetails HTTP/1.1
+content-type: application/json
+Authorization: Bearer 
+
+### edit user details
+PATCH http://localhost:3001/account/editUserDetails HTTP/1.1
+content-type: application/json
+Authorization: Bearer 
+
+{
+    "firstname":"limmm1",
+    "lastname":"kath",
+    "gender": "Female",
+    "residence":"Malaysia",
+    "occupation":"Student",
+    "age":"19",
+    "education":"Tertiary"
+
+}
+
+### send reset password link
+POST http://localhost:3001/user/password-reset HTTP/1.1
+content-type: application/json
+
+{
+    "email": "kai.ling@besquare.com.my"
+
+}
+
+### reset password
+POST http://localhost:3001/user/password-reset/2/cd013345b7605c2c790f3503139011667466e78f4385a0462c558dbb84624694 HTTP/1.1
+content-type: application/json
+
+{
+    "password":"Abcd1234!@",
+    "confirm_password":"Abcd1234!@"
+}
+
+### logout
+POST http://localhost:3001/account/logout HTTP/1.1
+content-type: application/json
+Authorization: Bearer 
