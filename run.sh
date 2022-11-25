@@ -17,4 +17,4 @@ fi
 #cd out to root directory
 cd ..;
 #docker compose up
-docker compose --env-file .env up --build
+docker compose --env-file .env up -d --build
