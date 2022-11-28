@@ -43,7 +43,7 @@ const server = http.createServer(app);
 //attach http server to socket.io
 const io = require("socket.io")(server, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: "https://sintetik.xyz",
     methods: ["GET", "POST"],
   },
 });
