@@ -5,7 +5,7 @@ const algorithm = 'aes-256-ctr';
 const secretKey = env.SECRET;
 
 const encrypt = text => {
-  const iv = crypto.randomBytes(16);
+  const iv = crypto.randomBytes(32);
 
   const cipher = crypto.createCipheriv(algorithm, secretKey, iv);
 
