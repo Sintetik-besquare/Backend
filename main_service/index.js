@@ -154,6 +154,6 @@ io.on("connection", async (socket) => {
 });
 
 // backend server is listening on port 3001
-const server = app.listen(port, () => {
+app.listen(port, () => {
   console.log(`Server is running on ${port}`);
 });
