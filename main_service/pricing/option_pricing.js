@@ -27,14 +27,14 @@ function bs_binary_option(St, K, sigma, delta_t, r, d, option_type, contract_typ
 
 // calculate the binary option pricing for call and put options
 
-if(contract_type = "Rise/fall"){
+if(contract_type === "Rise/fall"){
   if (option_type === "call") {
     return cdfNormal(d2, 0, 1) * Math.exp(-r * delta_t);
   } else if (option_type === "put"){
     return cdfNormal(-d2, 0, 1) * Math.exp(-r * delta_t);
   };
 }
-else if (contract_type = "Even/odd")
+else if (contract_type === "Even/odd")
 {
   //call and put have the same payout
   return 0.5 * Math.exp(-r * delta_t);
