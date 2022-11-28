@@ -5,14 +5,14 @@ const algorithm = 'aes-256-ctr';
 const secretKey = env.SECRET;
 
 const encrypt = text => {
-  const iv = crypto.randomBytes(32);
+  const iv = crypto.randomBytes(16);
 
   const cipher = crypto.createCipheriv(algorithm, secretKey, iv);
 
   const encrypted = Buffer.concat([cipher.update(text), cipher.final()]);
 
   return {
-    iv: iv.toString('hex'),
+    iv: iv.toString('hex').slice(0, 16),
     content: encrypted.toString('hex')
   };
 }
