@@ -49,7 +49,7 @@ app.use(errorHandler);
 
 //create backend server
 app = http.createServer(app);
-module.exports = app;
+
 //attach http server to socket.io
 const io = require("socket.io")(app, {
   cors: {
