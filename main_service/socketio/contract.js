@@ -150,7 +150,7 @@ class Contract {
     ) {
       return {
         status: false,
-        errors: "stake must be a number and must greater than 0.01",
+        errors: "stake must be a number and not less than 0.01",
       };
     }
     //check client balance
