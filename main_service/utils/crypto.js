@@ -12,7 +12,7 @@ const encrypt = text => {
   const encrypted = Buffer.concat([cipher.update(text), cipher.final()]);
 
   return {
-    iv: iv.toString('hex').slice(0, 16),
+    iv: iv.toString('hex'),
     content: encrypted.toString('hex')
   };
 }
