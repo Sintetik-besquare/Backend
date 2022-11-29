@@ -108,7 +108,7 @@ io.on("connection", async (socket) => {
 
   socket.on("order", async (data) => {
     try{
-      let { index, stake, ticks, option_type, contract_type, entry_time } = data;
+      let { index, stake, ticks, option_type, contract_type, entry_time, digit } = data;
 
       const contract = new Contract(
         index,
@@ -117,7 +117,8 @@ io.on("connection", async (socket) => {
         contract_type,
         stake,
         ticks,
-        entry_time
+        entry_time,
+        digit
       );
 
       //buy contract

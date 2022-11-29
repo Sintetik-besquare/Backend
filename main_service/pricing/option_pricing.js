@@ -38,6 +38,16 @@ else if (contract_type === "Even/odd")
 {
   //call and put have the same payout
   return 0.5 * Math.exp(-r * delta_t);
+} 
+else if (contract_type === "Matches/differs") 
+{
+  if (option_type === "matches"){
+    // probability of matching is 0.1
+    return 0.1 * Math.exp(-r * delta_t);
+  } else if (option_type === "differs") {
+    // probability of differing is 0.9
+    return 0.9 * Math.exp(-r * delta_t)
+  }
 };
 
 }
