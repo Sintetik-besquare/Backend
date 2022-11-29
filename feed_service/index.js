@@ -28,15 +28,7 @@ app.use("*", (req, res) => {
   });
 });
 
-const Redis = require("ioredis");
-
-const env = process.env;
-const redis = new Redis({
-  host: "redis",
-  port: env.REDIS_PORT,
-  password: env.REDIS_PASSWORD,
-});
-
+const redis = require("./dbconfig/redis_config");
 //create feed server
 const server = http.createServer(app);
 
@@ -51,16 +43,44 @@ const io = require("socket.io")(server, {
 //connect to socketio
 io.on("connection", async (socket) => {
   console.log("Client connected!!!!");
+  function checkIndex(index) {
+    //check ticks
+    let index_list = ["VOL20", "VOL40", "VOL60", "VOL80", "VOL100", "VOL200"];
+    let found = index_list.some((i) => i === index);
+    if (!found) {
+      return {
+        errors:
+          "Index can only be VOL20, VOL40, VOL60, VOL80, VOL100 or VOL200",
+      };
+    }
+  }
+
+  function sendFeed(channel, message) {
+    socket.emit("feed", message);
+  }
 
   try {
-    await redis.subscribe("VOL100");
-    await redis.on("message", (channel, message) => {
-      socket.emit("getfeed", message);
+    //get selected index from client
+    socket.on("index", async (data) => {
+      let { index } = data;
+      
+      //check whether the index is valid index
+      const check = checkIndex(index);
+      if (check) {
+        socket.emit("feed", check);
+      }
+
+      await redis.subscribe(index);
+      // await redis.on("message", sendFeed); < add this here everytime refresh the feed connection will be removed
     });
 
+    await redis.on("message", sendFeed);
+
     socket.on("disconnect", async () => {
+      await redis.removeListener("message", sendFeed);
       console.log("Client disconnected");
     });
+
   } catch (error) {
     console.log(error);
   }
