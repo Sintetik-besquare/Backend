@@ -51,19 +51,30 @@ const io = require("socket.io")(server, {
 //connect to socketio
 io.on("connection", async (socket) => {
   console.log("Client connected!!!!");
-
-  try {
-    await redis.subscribe("VOL100");
-    await redis.on("message", (channel, message) => {
-      socket.emit("getfeed", message);
-    });
-
-    socket.on("disconnect", async () => {
-      console.log("Client disconnected");
-    });
-  } catch (error) {
-    console.log(error);
+  let stream = "VOL100";
+  function sendPacket(channel, message) {
+    if (channel !== stream) return;
+    socket.emit("getfeed", message);
   }
+  //attach the handler
+  await redis.on("message", sendPacket);
+  async function initStream(s) {
+    stream = s;
+    try {
+      await redis.subscribe(s);
+    } catch (e) {
+      throw e;
+    }
+  }
+  socket.on('select',(data)=>{
+    initStream(data)
+  })
+  socket.on("disconnect", async () => {
+    redis.removeListener("message", sendPacket);
+    console.log("Client disconnected");
+  });
+  //default subscribe it to VOL100
+  // initStream(stream);
 });
 
 //feed server is listening on port 3002
