@@ -164,6 +164,7 @@ class Contract {
       };
     }
     //check digit if contract is matches/differs 
+    if(this.contract_type==="Matches/differs"){
     let digit = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
     let found4 = digit.some((digit)=>digit===this.digit);
     if (!found4) {
@@ -171,6 +172,7 @@ class Contract {
         status: false,
         errors: "Digit can only between 0 to 9 and not empty",
       };
+    };
     }
     //check stake
     if (
@@ -208,12 +210,17 @@ class Contract {
       entry_price: this.entry_price,
     };
 
+    //include digit if the contract is Matches/differ
+    if(this.contract_type==="Matches/differs"){
+      r.digit = this.digit;
+    };
+
     //deduct balance with stake and update it to client_account table
     //store buy contract summary
     const my_query = {
-      text: `CALL updateActiveContract($1,$2,$3,$4,$5,$6,$7,$8,'Buy');`,
+      text: `CALL updateActiveContract($1,$2,$3,$4,$5,$6,$7,$8,$9,'Buy');`,
       values: [
-        this.index,
+        r.index,
         r.contract_type,
         r.option_type,
         r.ticks,
@@ -221,6 +228,7 @@ class Contract {
         r.entry_time,
         r.entry_price,
         r.client_id,
+        r.digit
       ],
     };
     await queryByPromise(my_query);
@@ -256,6 +264,7 @@ class Contract {
       client_id: this.client_id,
       contract_id: this.contract_id,
       option_type: this.option_type,
+      ticks: this.ticks,
       stake: this.stake,
       entry_price: this.entry_price,
       entry_time: this.entry_time,
@@ -276,7 +285,12 @@ class Contract {
     }else{
       r.payout = final_payout;
     }
- 
+
+    //include digit if the contract is Matches/differ
+    if(this.contract_type==="Matches/differs"){
+      r.digit = this.digit;
+    };
+  
     const my_query = {
       text: `CALL updateClosedContract($1,$2,$3,$4,$5,$6,'Sell');`,
       values: [
@@ -288,6 +302,7 @@ class Contract {
         r.contract_id,
       ],
     };
+    console.log(r.payout);
     await queryByPromise(my_query);
     return r;
   }

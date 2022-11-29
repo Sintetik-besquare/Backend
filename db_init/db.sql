@@ -47,6 +47,7 @@ CREATE TABLE IF NOT EXISTS client.contract_summary(
     exit_time bigint,
     entry_spot numeric(22, 2) NOT NULL,
     exit_spot numeric(22, 2),
+    digit numeric(1),
     client_id bigint REFERENCES client.account(client_id)
 );
 
@@ -116,7 +117,7 @@ CREATE OR REPLACE PROCEDURE updateActiveContract(
     "entrytime" BIGINT,
     "entryspot" NUMERIC,
     "clientid"  BIGINT,
-
+    "pdigit" NUMERIC,
     "transactiontype" VARCHAR
 )
 LANGUAGE plpgsql
@@ -125,8 +126,8 @@ BEGIN
     UPDATE client.account SET balance = balance-"premium" WHERE client_id = "clientid";
     
     WITH ins AS (
-        INSERT INTO client.contract_summary (symbol,contract_type,option_type,duration,stake,entry_time,entry_spot,client_id)
-        VALUES("index","contracttype","optiontype","ticks","premium","entrytime","entryspot","clientid")
+        INSERT INTO client.contract_summary (symbol,contract_type,option_type,duration,stake,entry_time,entry_spot,client_id,digit)
+        VALUES("index","contracttype","optiontype","ticks","premium","entrytime","entryspot","clientid","pdigit")
         RETURNING contract_id
     )
     INSERT INTO client.transaction (transaction_time,transaction_type,transaction_amount,balance,contract_id,client_id)
