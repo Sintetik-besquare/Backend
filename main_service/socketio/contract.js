@@ -48,8 +48,6 @@ class Contract {
   }
   isWinningMatchesDiffers(current_price){
     if (this.option_type === "differs") {
-      console.log((current_price.toFixed(2).slice(-1)));
-      console.log(this.digit.toString());
       if ((current_price.toFixed(2).slice(-1))===this.digit.toString()) {
         return "Lost";
       }
@@ -276,9 +274,9 @@ class Contract {
     if(r.status === "Lost"){
       r.payout = 0.0;
     }else{
-      r.payout = parseFloat(final_payout);
+      r.payout = final_payout;
     }
-  console.log(r.payout);
+ 
     const my_query = {
       text: `CALL updateClosedContract($1,$2,$3,$4,$5,$6,'Sell');`,
       values: [
