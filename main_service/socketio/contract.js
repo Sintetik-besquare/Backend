@@ -48,8 +48,6 @@ class Contract {
   }
   isWinningMatchesDiffers(current_price){
     if (this.option_type === "differs") {
-      console.log((current_price.toFixed(2).slice(-1)));
-      console.log(this.digit.toString());
       if ((current_price.toFixed(2).slice(-1))===this.digit.toString()) {
         return "Lost";
       }
