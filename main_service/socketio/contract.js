@@ -100,7 +100,8 @@ class Contract {
       ) +
         this.comm);
         
-    return (Math.round(payout * 100) / 100).toFixed(2);
+    // return (Math.round(payout * 100) / 100).toFixed(2);
+    return (Math.round(payout * 100) / 100);
   }
 
   async buy() {
@@ -150,7 +151,7 @@ class Contract {
     ) {
       return {
         status: false,
-        errors: "stake must be a number and must greater than 0.01",
+        errors: "stake must be a number and not less than 0.01",
       };
     }
     //check client balance
@@ -245,9 +246,9 @@ class Contract {
     if(r.status === "Lost"){
       r.payout = 0.0;
     }else{
-      r.payout = final_payout;
+      r.payout = parseFloat(final_payout);
     }
-  
+  console.log(r.payout);
     const my_query = {
       text: `CALL updateClosedContract($1,$2,$3,$4,$5,$6,'Sell');`,
       values: [

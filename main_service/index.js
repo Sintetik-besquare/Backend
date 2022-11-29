@@ -49,7 +49,7 @@ app.use(errorHandler);
 
 //create backend server
 app = http.createServer(app);
-module.exports = app;
+
 //attach http server to socket.io
 const io = require("socket.io")(app, {
   cors: {
@@ -154,6 +154,6 @@ io.on("connection", async (socket) => {
 });
 
 // backend server is listening on port 3001
-const server = app.listen(port, () => {
+app.listen(port, () => {
   console.log(`Server is running on ${port}`);
 });
