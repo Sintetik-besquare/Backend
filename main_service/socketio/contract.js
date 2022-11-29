@@ -15,7 +15,19 @@ class Contract {
     this.isBalance = false;
     this.isEntryTime = false;
     this.comm = 0.012;
-    this.sigma = 1;
+    if (this.index === "VOL20") {
+      this.sigma = 0.2;
+    } else if (this.index === "VOL40") {
+      this.sigma = 0.4;
+    } else if (this.index === "VOL60") {
+      this.sigma = 0.6;
+    } else if (this.index === "VOL80") {
+      this.sigma = 0.8;
+    } else if (this.index === "VOL100") {
+      this.sigma = 1;
+    }else if (this.index === "VOL200") {
+      this.sigma = 2;
+    }
     this.digit = digit;
   }
 
@@ -85,7 +97,6 @@ class Contract {
       r.status = this.isWinningMatchesDiffers(current_price);
     }
     
-
     return r;
   }
 
@@ -129,7 +140,7 @@ class Contract {
       return { status: false, errors: "Invalid entry time" };
     }
     //check index
-    let indices = ["VOL100"];
+    let indices = ["VOL20", "VOL40", "VOL60", "VOL80", "VOL100", "VOL200"];
     let found = indices.some((index) => index === this.index);
     if (!found) {
       return { status: false, errors: "Invalid index" };
@@ -302,7 +313,6 @@ class Contract {
         r.contract_id,
       ],
     };
-    console.log(r.payout);
     await queryByPromise(my_query);
     return r;
   }
