@@ -3,7 +3,7 @@ const contract_unit_price = require("../pricing/option_pricing");
 const redis = require("../dbconfig/redis_config");
 
 class Contract {
-  constructor(index, client_id, option_type, contract_type, stake, ticks, entry_time) {
+  constructor(index, client_id, option_type, contract_type, stake, ticks, entry_time, digit=0) {
     this.index = index;
     this.client_id = client_id;
     this.contract_type = contract_type;
@@ -16,7 +16,10 @@ class Contract {
     this.isEntryTime = false;
     this.comm = 0.012;
     this.sigma = 1;
+    this.digit = digit;
   }
+
+  //Rules of win and lost for all available contracts
   isWinningRiseFall(current_price){
     if (this.option_type === "call") {
       if (this.entry_price > current_price) {
@@ -32,12 +35,27 @@ class Contract {
   }
   isWinningEvenOdd(current_price){
     if (this.option_type === "even") {
-      if ((current_price.toString().slice(-1))%2 === 1) {
+      if ((current_price.toFixed(2).slice(-1))%2 === 1) {
         return "Lost";
       }
       return "Win";
     } else if (this.option_type === "odd") {
-      if ((current_price.toString().slice(-1))%2 === 1) {
+      if ((current_price.toFixed(2).slice(-1))%2 === 1) {
+        return "Win";
+      }
+      return "Lost";
+    }
+  }
+  isWinningMatchesDiffers(current_price){
+    if (this.option_type === "differs") {
+      console.log((current_price.toFixed(2).slice(-1)));
+      console.log(this.digit.toString());
+      if ((current_price.toFixed(2).slice(-1))===this.digit.toString()) {
+        return "Lost";
+      }
+      return "Win";
+    } else if (this.option_type === "matches") {
+      if ((current_price.toFixed(2).slice(-1))===this.digit.toString()) {
         return "Win";
       }
       return "Lost";
@@ -65,7 +83,9 @@ class Contract {
       r.status = this.isWinningRiseFall(current_price);
     }else if (this.contract_type === "Even/odd"){
       r.status = this.isWinningEvenOdd(current_price);
-    };
+    }else if (this.contract_type === "Matches/differs"){
+      r.status = this.isWinningMatchesDiffers(current_price);
+    }
     
 
     return r;
@@ -100,25 +120,24 @@ class Contract {
       ) +
         this.comm);
         
-    // return (Math.round(payout * 100) / 100).toFixed(2);
     return (Math.round(payout * 100) / 100);
   }
 
   async buy() {
     //check entry time
     let current_time = Math.floor(Date.now() / 1000);
-    if (this.entry_time >= current_time || this.entry_time < current_time - 1) {
+    if (this.entry_time >= current_time || this.entry_time < current_time - 1
+      || !this.entry_time || isNaN(this.entry_time) || /\s/.test(this.entry_time)) {
       return { status: false, errors: "Invalid entry time" };
     }
     //check index
-    // let indices = ["VOL20", "VOL40", "VOL60", "VOL80", "VOL100"];
     let indices = ["VOL100"];
     let found = indices.some((index) => index === this.index);
     if (!found) {
       return { status: false, errors: "Invalid index" };
     }
     //check contract type
-    let contract_type = ["Rise/fall", "Even/odd"];
+    let contract_type = ["Rise/fall", "Even/odd","Matches/differs"];
     let found2 = contract_type.some((type) => type === this.contract_type);
     if (!found2) {
       return { status: false, errors: "Invalid contract type" };
@@ -132,6 +151,10 @@ class Contract {
       if (this.option_type !== "even" && this.option_type !== "odd") {
         return { status: false, errors: "Invalid option type" };
       }
+    }else if (this.contract_type === "Matches/differs"){
+      if (this.option_type !== "matches" && this.option_type !== "differs") {
+        return { status: false, errors: "Invalid option type" };
+      }
     }
     //check ticks
     let ticks = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
@@ -142,13 +165,18 @@ class Contract {
         errors: "Ticks can only between 1 to 10 and not empty",
       };
     }
+    //check digit if contract is matches/differs 
+    let digit = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+    let found4 = digit.some((digit)=>digit===this.digit);
+    if (!found4) {
+      return {
+        status: false,
+        errors: "Digit can only between 0 to 9 and not empty",
+      };
+    }
     //check stake
     if (
-      isNaN(this.stake) ||
-      !this.stake ||
-      /\s/.test(this.stake) ||
-      this.stake < 0.01
-    ) {
+      isNaN(this.stake) || !this.stake || /\s/.test(this.stake) || this.stake < 0.01) {
       return {
         status: false,
         errors: "stake must be a number and not less than 0.01",
@@ -241,7 +269,9 @@ class Contract {
       r.status = this.isWinningRiseFall(this.exit_price);
     }else if (this.contract_type === "Even/odd"){
       r.status = this.isWinningEvenOdd(this.exit_price);
-    };
+    }else if (this.contract_type === "Matches/differs"){
+      r.status = this.isWinningMatchesDiffers(this.exit_price);
+    }
     //depend on status generate payout accordingly 
     if(r.status === "Lost"){
       r.payout = 0.0;
