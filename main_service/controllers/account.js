@@ -1,14 +1,7 @@
 const { queryByPromise } = require("../dbconfig/db");
 const bcrypt = require("bcrypt");
 const { validationResult } = require("express-validator");
-const Redis = require('ioredis');
-const env =process.env;
-const redis = new Redis({
-  host:'redis',
-  port:env.REDIS_PORT,
-  password:env.REDIS_PASSWORD
-});
-
+const redis = require("../dbconfig/redis_config");
 
 const accountController = {
   //Topup/Reset Balance
