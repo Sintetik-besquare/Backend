@@ -1,22 +1,13 @@
 const { queryByPromise } = require("../dbconfig/db");
 const contract_unit_price = require("../pricing/option_pricing");
-const validator = require("express-validator");
-//to determine whether a contract is close or open we need to add status column
-const Redis = require("ioredis");
-
-const env = process.env;
-const redis = new Redis({
-  host: "redis",
-  port: env.REDIS_PORT,
-  password: env.REDIS_PASSWORD,
-});
+const redis = require("../dbconfig/redis_config");
 
 class Contract {
-  constructor(index, client_id, option_type, stake, ticks, entry_time) {
+  constructor(index, client_id, option_type, contract_type, stake, ticks, entry_time, digit=0) {
     this.index = index;
     this.client_id = client_id;
-    this.contract_type = "Rise/fall";
-    this.option_type = option_type;
+    this.contract_type = contract_type;
+    this.option_type = option_type ;
     this.stake = stake;
     this.ticks = ticks;
     this.entry_time = entry_time;
@@ -34,35 +25,79 @@ class Contract {
       this.sigma = 0.8;
     } else if (this.index === "VOL100") {
       this.sigma = 1;
+    }else if (this.index === "VOL200") {
+      this.sigma = 2;
+    }
+    this.digit = digit;
+  }
+
+  //Rules of win and lost for all available contracts
+  isWinningRiseFall(current_price){
+    if (this.option_type === "call") {
+      if (this.entry_price > current_price) {
+        return "Lost";
+      }
+      return "Win";
+    } else if (this.option_type === "put") {
+      if (this.entry_price > current_price) {
+        return "Win";
+      }
+      return "Lost";
+    }
+  }
+  isWinningEvenOdd(current_price){
+    if (this.option_type === "even") {
+      if ((current_price.toFixed(2).slice(-1))%2 === 1) {
+        return "Lost";
+      }
+      return "Win";
+    } else if (this.option_type === "odd") {
+      if ((current_price.toFixed(2).slice(-1))%2 === 1) {
+        return "Win";
+      }
+      return "Lost";
+    }
+  }
+  isWinningMatchesDiffers(current_price){
+    if (this.option_type === "differs") {
+      if ((current_price.toFixed(2).slice(-1))===this.digit.toString()) {
+        return "Lost";
+      }
+      return "Win";
+    } else if (this.option_type === "matches") {
+      if ((current_price.toFixed(2).slice(-1))===this.digit.toString()) {
+        return "Win";
+      }
+      return "Lost";
     }
   }
 
-  async checkStatus() {
+  //return contract status for each tick
+  async checkStatus(timesRun) {
     //get current price
-    let current = await redis.xrevrange(this.index, "+", "-", "COUNT", "1");
-    //let current_time = current[0][1][3];
-    let current_price = current[0][1][1];
+    let current = await redis.xrange(
+      this.index,
+      (this.entry_time + timesRun) * 1000 + 1,
+      (this.entry_time + timesRun) * 1000 + 999
+    );
+    let current_price = parseFloat(current[0][1][1]);
 
     // console.log("entry price is ", this.entry_price, "time is", this.entry_time);
-    // console.log("current price is ", current_price, "time is", current_time);
+    // console.log("current price is ", current_price, "time is", this.entry_time + timesRun);
     let r = {
       contract_id: this.contract_id,
     };
-    if (this.option_type === "call") {
-      if (this.entry_price > current_price) {
-        r.status = "Lost";
-        return r;
-      }
-      r.status = "Win";
-      return r;
-    } else if (this.option_type === "put") {
-      if (this.entry_price > current_price) {
-        r.status = "Win";
-        return r;
-      }
-      r.status = "Lost";
-      return r;
+
+    //get contract status
+    if(this.contract_type === "Rise/fall"){
+      r.status = this.isWinningRiseFall(current_price);
+    }else if (this.contract_type === "Even/odd"){
+      r.status = this.isWinningEvenOdd(current_price);
+    }else if (this.contract_type === "Matches/differs"){
+      r.status = this.isWinningMatchesDiffers(current_price);
     }
+    
+    return r;
   }
 
   async checkBalance() {
@@ -93,31 +128,42 @@ class Contract {
         this.contract_type
       ) +
         this.comm);
-    return (Math.round(payout * 100) / 100).toFixed(2);
+        
+    return (Math.round(payout * 100) / 100);
   }
 
   async buy() {
     //check entry time
     let current_time = Math.floor(Date.now() / 1000);
-    if (this.entry_time >= current_time || this.entry_time < current_time - 1) {
+    if (this.entry_time >= current_time || this.entry_time < current_time - 1
+      || !this.entry_time || isNaN(this.entry_time) || /\s/.test(this.entry_time)) {
       return { status: false, errors: "Invalid entry time" };
     }
     //check index
-    // let indices = ["VOL20", "VOL40", "VOL60", "VOL80", "VOL100"];
-    let indices = ["VOL100"];
+    let indices = ["VOL20", "VOL40", "VOL60", "VOL80", "VOL100", "VOL200"];
     let found = indices.some((index) => index === this.index);
     if (!found) {
       return { status: false, errors: "Invalid index" };
     }
-    //check option type
-    if (this.option_type !== "put" && this.option_type !== "call") {
-      return { status: false, errors: "Invalid option type" };
-    }
     //check contract type
-    let contract_type = ["Rise/fall", "Even/odd"];
+    let contract_type = ["Rise/fall", "Even/odd","Matches/differs"];
     let found2 = contract_type.some((type) => type === this.contract_type);
     if (!found2) {
       return { status: false, errors: "Invalid contract type" };
+    }
+    //check option type
+    if(this.contract_type === "Rise/fall"){
+      if (this.option_type !== "put" && this.option_type !== "call") {
+        return { status: false, errors: "Invalid option type" };
+      }
+    }else if (this.contract_type === "Even/odd"){
+      if (this.option_type !== "even" && this.option_type !== "odd") {
+        return { status: false, errors: "Invalid option type" };
+      }
+    }else if (this.contract_type === "Matches/differs"){
+      if (this.option_type !== "matches" && this.option_type !== "differs") {
+        return { status: false, errors: "Invalid option type" };
+      }
     }
     //check ticks
     let ticks = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
@@ -128,16 +174,23 @@ class Contract {
         errors: "Ticks can only between 1 to 10 and not empty",
       };
     }
-    //check stake
-    if (
-      isNaN(this.stake) ||
-      !this.stake ||
-      /\s/.test(this.stake) ||
-      this.stake < 0.01
-    ) {
+    //check digit if contract is matches/differs 
+    if(this.contract_type==="Matches/differs"){
+    let digit = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+    let found4 = digit.some((digit)=>digit===this.digit);
+    if (!found4) {
       return {
         status: false,
-        errors: "stake must be a number",
+        errors: "Digit can only between 0 to 9 and not empty",
+      };
+    };
+    }
+    //check stake
+    if (
+      isNaN(this.stake) || !this.stake || /\s/.test(this.stake) || this.stake < 0.01) {
+      return {
+        status: false,
+        errors: "stake must be a number and not less than 0.01",
       };
     }
     //check client balance
@@ -154,7 +207,7 @@ class Contract {
     );
 
     let entry_price = price[0][1][1];
-    this.entry_price = entry_price;
+    this.entry_price = parseFloat(entry_price);
 
     let r = {
       status: true,
@@ -168,12 +221,17 @@ class Contract {
       entry_price: this.entry_price,
     };
 
+    //include digit if the contract is Matches/differ
+    if(this.contract_type==="Matches/differs"){
+      r.digit = this.digit;
+    };
+
     //deduct balance with stake and update it to client_account table
     //store buy contract summary
     const my_query = {
-      text: `CALL updateActiveContract($1,$2,$3,$4,$5,$6,$7,$8,'Buy');`,
+      text: `CALL updateActiveContract($1,$2,$3,$4,$5,$6,$7,$8,$9,'Buy');`,
       values: [
-        this.index,
+        r.index,
         r.contract_type,
         r.option_type,
         r.ticks,
@@ -181,6 +239,7 @@ class Contract {
         r.entry_time,
         r.entry_price,
         r.client_id,
+        r.digit
       ],
     };
     await queryByPromise(my_query);
@@ -206,8 +265,8 @@ class Contract {
       this.exit_time * 1000 + 999
     );
 
-    let exit_price = price;
-    this.exit_price = exit_price[0][1][1];
+    let exit_price = price[0][1][1];
+    this.exit_price = parseFloat(exit_price);
 
     let final_payout = await this.calculatePayout();
 
@@ -216,30 +275,33 @@ class Contract {
       client_id: this.client_id,
       contract_id: this.contract_id,
       option_type: this.option_type,
+      ticks: this.ticks,
       stake: this.stake,
       entry_price: this.entry_price,
       entry_time: this.entry_time,
       exit_price: this.exit_price,
       exit_time: this.exit_time,
     };
-
-    if (this.option_type === "call") {
-      if (this.entry_price > this.exit_price) {
-        r.status = "Lost";
-        r.payout = 0.0;
-      } else {
-        r.status = "Win";
-        r.payout = final_payout;
-      }
-    } else if (this.option_type === "put") {
-      if (this.entry_price > this.exit_price) {
-        r.status = "Win";
-        r.payout = final_payout;
-      } else {
-        r.status = "Lost";
-        r.payout = 0.0;
-      }
+    //get contract status
+    if(this.contract_type === "Rise/fall"){
+      r.status = this.isWinningRiseFall(this.exit_price);
+    }else if (this.contract_type === "Even/odd"){
+      r.status = this.isWinningEvenOdd(this.exit_price);
+    }else if (this.contract_type === "Matches/differs"){
+      r.status = this.isWinningMatchesDiffers(this.exit_price);
     }
+    //depend on status generate payout accordingly 
+    if(r.status === "Lost"){
+      r.payout = 0.0;
+    }else{
+      r.payout = final_payout;
+    }
+
+    //include digit if the contract is Matches/differ
+    if(this.contract_type==="Matches/differs"){
+      r.digit = this.digit;
+    };
+  
     const my_query = {
       text: `CALL updateClosedContract($1,$2,$3,$4,$5,$6,'Sell');`,
       values: [

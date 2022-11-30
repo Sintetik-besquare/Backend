@@ -1,27 +1,24 @@
 require("dotenv").config();
 const express = require("express");
-const http = require("http");
 const morgan = require("morgan");
 const cors = require("cors");
+const http = require("http");
 const { queryByPromise } = require("./dbconfig/db");
 const fs = require("fs");
 const path = require("path");
 const publicKey = fs.readFileSync(path.join(__dirname, "./jwt_certs/public.pem"), "utf8");
 const { decrypt } = require("./utils/crypto");
-const Redis = require("ioredis");
-const env = process.env;
-const redis = new Redis({
-  host: "redis",
-  port: env.REDIS_PORT,
-  password: env.REDIS_PASSWORD,
-});
+const redis=require('./dbconfig/redis_config');
+
 const errorHandler = require("./middlewares/errorHandler");
 
 //list of all available routes
 const userRouter = require("./routes/user");
 const accountRouter = require("./routes/account");
+
 //get port from environment and store in Express.
 const port = 3001;
+
 const app = express();
 
 //use cors() to allow backend server data be accessed by frontend server
@@ -111,15 +108,17 @@ io.on("connection", async (socket) => {
 
   socket.on("order", async (data) => {
     try{
-      let { index, stake, ticks, option_type, entry_time } = data;
+      let { index, stake, ticks, option_type, contract_type, entry_time, digit } = data;
 
       const contract = new Contract(
         index,
         client_id,
         option_type,
+        contract_type,
         stake,
         ticks,
-        entry_time
+        entry_time,
+        digit
       );
 
       //buy contract
@@ -134,7 +133,7 @@ io.on("connection", async (socket) => {
           timesRun += 1;
 
           //update whether contract is Wining
-          let status = await contract.checkStatus();
+          let status = await contract.checkStatus(timesRun);
           socket.emit("iswinning", status);
 
           //sell contract after contract expired
@@ -155,7 +154,7 @@ io.on("connection", async (socket) => {
   });
 });
 
-//backend server is listening on port 3001
+// backend server is listening on port 3001
 server.listen(port, () => {
   console.log(`Server is running on ${port}`);
 });
