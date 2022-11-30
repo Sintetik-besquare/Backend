@@ -9,6 +9,6 @@ router
 .post('/login',loginValidation,userController.loginUser)
 .post('/signup',signupValidation,userController.signupUser)
 .post('/password-reset',sendPasswordLinkValidation,userController.sendPasswordLink)
-.post('/password-reset/:userId/:token',resetPasswordValidation ,userController.resetPassword)
+.post('/password-reset/:id/:token',resetPasswordValidation ,userController.resetPassword)
 
 module.exports= router;     
