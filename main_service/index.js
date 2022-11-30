@@ -19,7 +19,7 @@ const accountRouter = require("./routes/account");
 //get port from environment and store in Express.
 const port = 3001;
 
-let app = express();
+const app = express();
 
 //use cors() to allow backend server data be accessed by frontend server
 app.use(cors());
@@ -48,10 +48,10 @@ app.use("*", (req, res) => {
 app.use(errorHandler);
 
 //create backend server
-app = http.createServer(app);
+const server = http.createServer(app);
 
 //attach http server to socket.io
-const io = require("socket.io")(app, {
+const io = require("socket.io")(server, {
   cors: {
     origin: "http://localhost:3000",
     methods: ["GET", "POST"],
@@ -155,6 +155,6 @@ io.on("connection", async (socket) => {
 });
 
 // backend server is listening on port 3001
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`Server is running on ${port}`);
 });
