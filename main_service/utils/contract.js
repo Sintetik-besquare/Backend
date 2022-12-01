@@ -1,5 +1,5 @@
 const { queryByPromise } = require("../dbconfig/db");
-const contract_unit_price = require("../pricing/option_pricing");
+const contract_unit_price = require("./option_pricing");
 const redis = require("../dbconfig/redis_config");
 
 class Contract {
