@@ -37,6 +37,9 @@ const requireAuth = async (req, res, next) => {
       values: [client_id],
     };
     const id = await queryByPromise(my_query);
+    if(id.result.length===0){
+      return res.status(401).json({errors: "Invalid JWT"});
+    }
     req.user = id.result[0].client_id;
     req.exp = exp;
     //go to next handler function
