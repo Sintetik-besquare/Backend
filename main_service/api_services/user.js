@@ -72,7 +72,7 @@ async function resetPasswordF(id,token,password,client_id){
     const new_hash = await hashPassword(password);
 
     //reset user password
-    await dbQuery.resetPassF(new_hash,client_id);
+    await dbQuery.resetPass(new_hash,client_id);
 
     //after reset password delete token
     await dbQuery.delToken(id,token);
