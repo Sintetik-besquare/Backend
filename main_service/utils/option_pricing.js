@@ -46,7 +46,7 @@ else if (contract_type === "Matches/differs")
     return 0.1 * Math.exp(-r * delta_t);
   } else if (option_type === "differs") {
     // probability of differing is 0.9
-    return 0.9 * Math.exp(-r * delta_t)
+    return 0.9 * Math.exp(-r * delta_t);
   }
 };
 
