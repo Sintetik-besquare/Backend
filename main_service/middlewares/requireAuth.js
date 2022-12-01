@@ -2,18 +2,9 @@ const jwt = require("jsonwebtoken");
 const { queryByPromise } = require("../dbconfig/db");
 const fs = require("fs");
 const path = require("path");
-const publicKey = fs.readFileSync(
-  path.join(__dirname, "../jwt_certs/public.pem"),
-  "utf8"
-);
+const publicKey = fs.readFileSync(path.join(__dirname, "../jwt_certs/public.pem"),"utf8");
 const { decrypt } = require("../utils/crypto");
-const Redis = require("ioredis");
-const env = process.env;
-const redis = new Redis({
-  host: "redis",
-  port: env.REDIS_PORT,
-  password: env.REDIS_PASSWORD,
-});
+const redis=require('../dbconfig/redis_config');
 
 const requireAuth = async (req, res, next) => {
   //verify authentication
@@ -46,6 +37,9 @@ const requireAuth = async (req, res, next) => {
       values: [client_id],
     };
     const id = await queryByPromise(my_query);
+    if(id.result.length===0){
+      return res.status(401).json({errors: "Invalid JWT"});
+    }
     req.user = id.result[0].client_id;
     req.exp = exp;
     //go to next handler function

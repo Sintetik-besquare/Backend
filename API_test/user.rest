@@ -13,7 +13,7 @@ content-type: application/json
 
 {
     "email": "kai.ling2@besquare.com.my",
-    "password": "Abcd1234!@"
+    "password": "AAAbc1234!!_"
 
 }
 ### reset userbalance
@@ -60,7 +60,6 @@ Authorization: Bearer
 PATCH http://localhost:3001/account/editUserDetails HTTP/1.1
 content-type: application/json
 Authorization: Bearer 
-
 {
     "firstname":"limmm1",
     "lastname":"kath",

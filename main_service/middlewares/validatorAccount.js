@@ -57,38 +57,38 @@ resetPasswordValidation = [
 
 userDetailsValidation = [
     body("firstname")
-    .optional({ checkFalsy: true })
     .isString().withMessage("Firstname must be a string").bail()
-    .isLength({ max: 255 }).withMessage("Maximum length equal to 255"),
+    .isLength({ max: 255 }).withMessage("Maximum length equal to 255")
+    .optional({ nullable: true, checkFalsy: true }),
 
     body("lastname")
-    .optional({ checkFalsy: true })
     .isString().withMessage("Lastname must be a string").bail()
-    .isLength({ max: 255 }).withMessage("Maximum length equal to 255"),
+    .isLength({ max: 255 }).withMessage("Maximum length equal to 255")
+    .optional({ nullable: true, checkFalsy: true }),
 
     body("gender")
-    .optional({ checkFalsy: true })
     .isString().withMessage("gender must be a string").bail()
-    .isIn(["Female","Male"]).withMessage("Gender can only have Female or Male"),
+    .isIn(["Female","Male"]).withMessage("Gender can only have Female or Male")
+    .optional({ nullable: true, checkFalsy: true }),
 
     //Todo:add isIn 
     body("residence")
-    .optional({ checkFalsy: true })
-    .isString().withMessage("Residence must be a string").bail(),
+    .isString().withMessage("Residence must be a string").bail()
+    .optional({ nullable: true, checkFalsy: true }),
 
      //Todo:add isIn 
     body("occupation")
-    .optional({ checkFalsy: true })
-    .isString().withMessage("Occupation must be a string").bail(),
+    .isString().withMessage("Occupation must be a string").bail()
+    .optional({ nullable: true, checkFalsy: true }),
 
     body("age")
-    .optional({ checkFalsy: true })
-    .isInt({min:18, max:99}).withMessage("Age must between 18 to 99"),
+    .isInt({min:18, max:99}).withMessage("Age must between 18 to 99")
+    .optional({ nullable: true, checkFalsy: true }),
 
     body("education")
-    .optional({ checkFalsy: true })
     .isString().withMessage("Education must be a string").bail()
     .isIn(["Elementary","Secondary","Tertiary","Others"]).withMessage("Education can have Elementary,Secondary,Tertiary and others")
+    .optional({ nullable: true, checkFalsy: true })
 ]
 
 module.exports={
