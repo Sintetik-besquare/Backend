@@ -52,8 +52,7 @@ const dbQuery = require("../db_query/query");
     .custom(async(password,{ req })=>{
     try{
       const hash_password = await dbQuery.getPassByEmail(req.body.email);
-      const user_hash_password = hash_password;
-      const match = await bcrypt.compare(password, user_hash_password);
+      const match = await bcrypt.compare(password, hash_password);
 
       if (!match) {
         return Promise.reject('Invalid password');
