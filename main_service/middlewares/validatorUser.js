@@ -1,20 +1,16 @@
-const { queryByPromise } = require("../dbconfig/db");
 const { body } = require('express-validator');
 const bcrypt = require("bcrypt");
+const dbQuery = require("../db_query/query");
   signupValidation= [
     body('email')
     .not().isEmpty().withMessage("Email cannot be empty").bail()
     .isEmail().withMessage("Invalid email format").bail()
     .custom(async(email)=>{
-      const my_query = {
-        text:
-        `select * from client.account where email=$1;`,
-        values:[email]
-      };
-      const user_email = await queryByPromise(my_query);
-                if(user_email.result.length !== 0){
-                    return Promise.reject('Duplicated email');
-                };
+    
+      const user_email = await dbQuery.getEmail(email);
+      if(user_email.result.length !== 0){
+        return Promise.reject('Duplicated email');
+    };
     }),
 
     body('password')
@@ -45,28 +41,18 @@ const bcrypt = require("bcrypt");
     .not().isEmpty().withMessage("Email cannot be empty").bail()
     .isEmail().withMessage("Invalid email").bail()
     .custom(async(email)=>{
-      const my_query = {
-        text:
-        `select * from client.account where email=$1;`,
-        values:[email]
-      }
-      const user_email = await queryByPromise(my_query);
-                if(user_email.result.length === 0){
-                    return Promise.reject('Invalid email');
-                };
+      const user_email = await dbQuery.getEmail(email);
+      if(user_email.result.length === 0){
+        return Promise.reject('Invalid email');
+    };
     }),
 
     body('password')
     .not().isEmpty().withMessage("Password cannot be empty").bail()
     .custom(async(password,{ req })=>{
     try{
-      const my_query = {
-        text:
-        `SELECT password FROM client.account WHERE email=$1;`,
-        values:[req.body.email]
-      };
-      const hash_password = await queryByPromise(my_query);
-      const user_hash_password = hash_password.result[0].password;
+      const hash_password = await dbQuery.getPassByEmail(req.body.email);
+      const user_hash_password = hash_password;
       const match = await bcrypt.compare(password, user_hash_password);
 
       if (!match) {
@@ -87,14 +73,10 @@ const bcrypt = require("bcrypt");
     .not().isEmpty().withMessage("Email cannot be empty").bail()
     .isEmail().withMessage("Invalid email format").bail()
     .custom(async(email)=>{
-      const my_query={
-        text:`select * from client.account where email=$1;`,
-        values:[email]
-      }
-      const user_email = await queryByPromise(my_query);
-                if(user_email.result.length === 0){
-                    return Promise.reject('Email does not exist');
-                };
+      const user_email = await dbQuery.getEmail(email);
+      if(user_email.result.length === 0){
+        return Promise.reject('Email does not exist');
+    };
     }),
   ];
 

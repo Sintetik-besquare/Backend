@@ -5,6 +5,7 @@ const path = require("path");
 const publicKey = fs.readFileSync(path.join(__dirname, "../jwt_certs/public.pem"),"utf8");
 const { decrypt } = require("../utils/crypto");
 const redis=require('../dbconfig/redis_config');
+const dbQuery = require("../db_query/query");
 
 const requireAuth = async (req, res, next) => {
   //verify authentication
@@ -32,14 +33,12 @@ const requireAuth = async (req, res, next) => {
     client_id = decrypt(client_id);
 
     //req.user attach user_id into the req.body for the next request function
-    const my_query = {
-      text: `select client_id from client.account where client_id=$1;`,
-      values: [client_id],
-    };
-    const id = await queryByPromise(my_query);
-    if(id.result.length===0){
+    const id = await dbQuery.validateCLientId(client_id);
+    
+    if(id.result.length === 0){
       return res.status(401).json({errors: "Invalid JWT"});
     }
+    
     req.user = id.result[0].client_id;
     req.exp = exp;
     //go to next handler function

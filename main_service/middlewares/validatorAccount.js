@@ -1,7 +1,7 @@
-const { queryByPromise } = require("../dbconfig/db");
 const { body } = require('express-validator');
 const bcrypt = require("bcrypt");
-
+const dbQuery = require("../db_query/query");
+const { Client } = require("pg");
 resetBalanceValidation = [
     body("reset_balance")
     .not().isEmpty().withMessage("Invalid action").bail()
@@ -14,16 +14,12 @@ resetPasswordValidation = [
     .isLength({ min: 8 }).withMessage("Invalid Password").bail()
     .custom(async (password,{req})=>{
         //get old hash password and use bcrypt to compare
-        const my_query = {
-            text:
-            `SELECT password FROM client.account WHERE client_id=$1;`,
-            values:[req.user]
-          }
-        const user_hash_password = await queryByPromise(my_query);
+        const user_hash_password = await dbQuery.getPassword(req.user);
+
         //compare the hash password with old password
         const match = await bcrypt.compare(
         password,
-        user_hash_password.result[0].password
+        user_hash_password
       );
 
       if (!match) {
