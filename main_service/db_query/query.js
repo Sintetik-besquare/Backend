@@ -3,7 +3,6 @@ const { queryByPromise } = require("../dbconfig/db");
 
 async function createUser(email, hash, initial_balance, date_join) {
   //store user email & password to db
-  console.log("real creatuser called");
   const my_query = {
     text: `INSERT INTO client.account (email, password, balance, date_join) 
     VALUES($1,$2,$3,$4) RETURNING client_id;`,
