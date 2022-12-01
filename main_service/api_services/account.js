@@ -39,7 +39,7 @@ async function getContractSummary(client_id) {
   return contract_summary;
 }
 
-async function resetPassL(client_id, new_password) {
+async function resetPassAfterLogin(client_id, new_password) {
   //hash new password
   const new_hash = await hashPassword(new_password);
 
@@ -71,7 +71,7 @@ module.exports = {
   getBalance,
   getTransaction,
   getContractSummary,
-  resetPassL,
+  resetPassAfterLogin,
   getDetails,
   editDetails,
   logout

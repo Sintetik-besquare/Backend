@@ -90,7 +90,7 @@ const accountController = {
       const client_id = req.user;
       const { new_password } = req.body;
 
-      await apiService.resetPassL(client_id,new_password);
+      await apiService.resetPassAfterLogin(client_id,new_password);
 
       return res.status(200).json({
         sucess: true,
