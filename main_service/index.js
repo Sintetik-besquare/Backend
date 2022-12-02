@@ -97,7 +97,7 @@ io.use(async (socket, next) => {
     next(error);
   }
 });
-const Contract = require("./socketio/contract");
+const Contract = require("./utils/contract");
 
 //connect to socketio
 io.on("connection", async (socket) => {

@@ -54,6 +54,7 @@ io.on("connection", async (socket) => {
       };
     }
   }
+  const crypto = require("crypto");
 
   function sendFeed(channel, message) {
     socket.emit("feed", message);
@@ -63,18 +64,20 @@ io.on("connection", async (socket) => {
     //get selected index from client
     socket.on("index", async (data) => {
       let { index } = data;
-      
+
       //check whether the index is valid index
-      const check = checkIndex(index);
-      if (check) {
-        socket.emit("feed", check);
+      const index_not_found = checkIndex(index);
+      if (index_not_found) {
+        socket.emit("feed", index_not_found);
       }
 
       await redis.subscribe(index);
-      // await redis.on("message", sendFeed); < add this here everytime refresh the feed connection will be removed
+      // await redis.on("message", sendFeed); // add this here everytime refresh the feed connection will be removed
     });
 
     await redis.on("message", sendFeed);
+    // await redis.removeListener("message", sendFeed);
+
 
     socket.on("disconnect", async () => {
       await redis.removeListener("message", sendFeed);
