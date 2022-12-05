@@ -15,7 +15,7 @@ app.use(morgan("dev"));
 app.use(cors());
 //allow user to send request in json format
 app.use(express.json());
-//allow user to send request in nested jason format
+//allow user to send request in nested json format
 app.use(express.urlencoded({ extended: true }));
 
 //API endpoint
