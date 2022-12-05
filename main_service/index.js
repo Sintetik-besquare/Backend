@@ -3,12 +3,12 @@ const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
 const http = require("http");
-const { queryByPromise } = require("./dbconfig/db");
 const fs = require("fs");
 const path = require("path");
 const publicKey = fs.readFileSync(path.join(__dirname, "./jwt_certs/public.pem"), "utf8");
 const { decrypt } = require("./utils/crypto");
 const redis=require('./dbconfig/redis_config');
+const dbQuery = require("./db_query/query");
 
 const errorHandler = require("./middlewares/errorHandler");
 
@@ -16,21 +16,19 @@ const errorHandler = require("./middlewares/errorHandler");
 const userRouter = require("./routes/user");
 const accountRouter = require("./routes/account");
 
-//get port from environment and store in Express.
 const port = 3001;
-
 const app = express();
 
 //use cors() to allow backend server data be accessed by frontend server
 app.use(cors());
 
 //log all request and error in development mode
-//this might need to move the very begining of route declaration
 app.use(morgan("dev"));
 
-//allow user to send req jason format
+//allow user to send request json format
 app.use(express.json());
-//allow user to send req in nested jason format
+
+//allow user to send request in nested json format
 app.use(express.urlencoded({ extended: true }));
 
 //API endpoints
@@ -47,7 +45,6 @@ app.use("*", (req, res) => {
 //error handling 
 app.use(errorHandler);
 
-//create backend server
 const server = http.createServer(app);
 
 //attach http server to socket.io
@@ -83,11 +80,12 @@ io.use(async (socket, next) => {
     client_id = decrypt(client_id);
     
     //check whether the client_id exist in db
-    const my_query = {
-      text: `select client_id from client.account where client_id=$1;`,
-      values: [client_id],
+    const id = await dbQuery.validateCLientId(client_id);
+
+    if(id.result.length === 0){
+      const error = new Error("Invalid JWT");
+      next(error);
     };
-    const id = await queryByPromise(my_query);
 
     //pass client_id to sokect on connection
     socket.data = id.result[0].client_id;
