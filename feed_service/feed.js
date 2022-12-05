@@ -8,7 +8,6 @@ function brownianMotion(mu, sigma) {
   X = (1/(365*86400) * (mu - (0.5 * Math.pow(sigma, 2)))) + (sigma * W);
   S = S_feed[S_feed.length - 1] * Math.exp(X);
   return S;
-  // geometric brownian motion
 }
 
 let S0 = 20000;

@@ -3,19 +3,19 @@ const express = require("express");
 const http = require("http");
 const morgan = require("morgan");
 const cors = require("cors");
-
+const redis = require("./dbconfig/redis_config");
 const historicalFeedRouter = require("./routes/historical_feed");
 
 const port = 3002;
 const app = express();
 
 //log all request and error in development mode
-//this might need to move the very begining of route declaration
 app.use(morgan("dev"));
+//use cors() to allow backend server data be accessed by frontend server
 app.use(cors());
-//allow user to send req jason format
+//allow user to send request in json format
 app.use(express.json());
-//allow user to send req in nested jason format
+//allow user to send request in nested jason format
 app.use(express.urlencoded({ extended: true }));
 
 //API endpoint
@@ -28,8 +28,6 @@ app.use("*", (req, res) => {
   });
 });
 
-const redis = require("./dbconfig/redis_config");
-//create feed server
 const server = http.createServer(app);
 
 //attach http server to socket.io
@@ -54,7 +52,6 @@ io.on("connection", async (socket) => {
       };
     }
   }
-  const crypto = require("crypto");
 
   function sendFeed(channel, message) {
     socket.emit("feed", message);
@@ -72,12 +69,9 @@ io.on("connection", async (socket) => {
       }
 
       await redis.subscribe(index);
-      // await redis.on("message", sendFeed); // add this here everytime refresh the feed connection will be removed
     });
 
     await redis.on("message", sendFeed);
-    // await redis.removeListener("message", sendFeed);
-
 
     socket.on("disconnect", async () => {
       await redis.removeListener("message", sendFeed);
