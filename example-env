@@ -1,0 +1,14 @@
+POSTGRES_USER="your_postgres_user"
+POSTGRES_PASSWORD="your_postgres_password"
+SECRET="your_16_digits_secret"
+
+REDIS_PORT=6379
+REDIS_PASSWORD="redis_secret_password"
+
+EMAIL_HOST="smtp.gmail.com"
+EMAIL_USER="your_own_email"
+EMAIL_PASSWORD="follow this link to obtain password https://medium.com/@TusharKanjariya/send-email-using-node-mailer-in-node-js-b813734e9a3"
+EMAIL_SENDER="your_own_email"
+EMAIL_BASE_URL=http://localhost:3001/user
+
+

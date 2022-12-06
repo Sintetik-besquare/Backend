@@ -148,7 +148,7 @@ class Contract {
     let current_time = Math.floor(Date.now() / 1000);
     if (
       this.entry_time >= current_time ||
-      this.entry_time < current_time - 1 ||
+      this.entry_time < current_time - 5 ||
       !this.entry_time ||
       isNaN(this.entry_time) ||
       /\s/.test(this.entry_time)
