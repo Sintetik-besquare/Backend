@@ -1,6 +1,6 @@
 POSTGRES_USER="your_postgres_user"
 POSTGRES_PASSWORD="your_postgres_password"
-SECRET="your_16_digits_secret"
+SECRET="your_32_digits_secret"
 
 REDIS_PORT=6379
 REDIS_PASSWORD="redis_secret_password"
